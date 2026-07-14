@@ -1,10 +1,40 @@
 export const CATEGORIES = [
-  { id: 'men', name: 'Men', icon: '👔', sub: ['Shirts', 'T-Shirts', 'Jeans', 'Jackets'] },
-  { id: 'women', name: 'Women', icon: '👗', sub: ['Dresses', 'Tops', 'Kurtis', 'Sarees'] },
-  { id: 'kids', name: 'Kids', icon: '🧒', sub: ['Boys', 'Girls', 'Infants'] },
-  { id: 'accessories', name: 'Accessories', icon: '👜', sub: ['Bags', 'Belts', 'Caps'] },
-  { id: 'footwear', name: 'Footwear', icon: '👟', sub: ['Sneakers', 'Formal', 'Sandals'] },
-  { id: 'sports', name: 'Sportswear', icon: '🏃', sub: ['Activewear', 'Track pants'] },
+  {
+    id: 'men',
+    name: 'Men',
+    image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=300&h=300&fit=crop',
+    sub: ['Shirts', 'T-Shirts', 'Jeans', 'Jackets'],
+  },
+  {
+    id: 'women',
+    name: 'Women',
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&h=300&fit=crop',
+    sub: ['Dresses', 'Tops', 'Kurtis', 'Sarees'],
+  },
+  {
+    id: 'kids',
+    name: 'Kids',
+    image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=300&h=300&fit=crop',
+    sub: ['Boys', 'Girls', 'Infants'],
+  },
+  {
+    id: 'accessories',
+    name: 'Accessories',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop',
+    sub: ['Bags', 'Belts', 'Caps'],
+  },
+  {
+    id: 'footwear',
+    name: 'Footwear',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop',
+    sub: ['Sneakers', 'Formal', 'Sandals'],
+  },
+  {
+    id: 'sports',
+    name: 'Sportswear',
+    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=300&h=300&fit=crop',
+    sub: ['Activewear', 'Track pants'],
+  },
 ]
 
 export const PRODUCTS = [
@@ -124,7 +154,7 @@ export const PRODUCTS = [
     reviews: 155,
     sizes: ['One Size'],
     colors: ['Natural', 'Teal'],
-    image: 'https://images.unsplash.com/photo-1590874103328-eac38a67478a?w=400&h=500&fit=crop',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop',
     bestseller: false,
     description: 'Spacious eco canvas tote for everyday carry.',
   },

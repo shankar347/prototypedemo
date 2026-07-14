@@ -352,10 +352,25 @@ function HomeScreen({ go }) {
               type="button"
               className="card"
               onClick={() => go('search')}
-              style={{ padding: '14px 8px', textAlign: 'center' }}
+              style={{ padding: 0, textAlign: 'center', overflow: 'hidden' }}
             >
-              <div style={{ fontSize: 26, marginBottom: 6 }}>{c.icon}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--slate)' }}>{c.name}</div>
+              <div
+                style={{
+                  width: '100%',
+                  aspectRatio: '1',
+                  overflow: 'hidden',
+                  background: 'var(--teal-light)',
+                }}
+              >
+                <img
+                  src={c.image}
+                  alt={c.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--slate)', padding: '8px 6px 10px' }}>
+                {c.name}
+              </div>
             </button>
           ))}
         </div>
