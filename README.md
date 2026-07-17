@@ -1,6 +1,8 @@
-# QApparel — Q-Commerce Apparel Platform
+# KudiCart — Q-Commerce Apparel Platform
 
 Interactive UI prototype for an apparel ordering & delivery platform (Customer, Vendor, Driver, Admin).
+
+Theme inspired by the [KudiCart Figma](https://www.figma.com/design/4WDOshRtU3YVnhuFvC5MIO/KudiCart?node-id=213-12910) — soft sky-blue backgrounds, glass-style cards, and the KudiCart “A” logo.
 
 ## Run
 
@@ -21,4 +23,4 @@ Open the local URL shown in the terminal (usually http://localhost:5173).
 | `/driver` | Driver app (requests, navigation, SOS) |
 | `/admin` | Admin panel (users, vendors, coupons, commission…) |
 
-Theme colors match the requirement PDF: teal `#00C09F` and slate `#1A535C`.
+Brand colors: sky blue `#4DB8E8`, deep blue `#1E4A6E`, ice background `#EBF5FB`.

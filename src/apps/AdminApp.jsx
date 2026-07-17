@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -36,6 +36,7 @@ const NAV = [
   { id: 'customers', label: 'Customers', icon: Users },
   { id: 'vendors', label: 'Vendors', icon: Store },
   { id: 'drivers', label: 'Drivers', icon: Bike },
+  { id: 'darkstore', label: 'Darkstore', icon: Store },
   { id: 'users', label: 'Manage Users', icon: UserCog },
   { id: 'categories', label: 'Categories', icon: Tags },
   { id: 'apparels', label: 'Apparels', icon: Shirt },
@@ -69,9 +70,23 @@ export default function AdminApp() {
   return (
     <div className="panel-layout">
       <aside className={`panel-sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div style={{ padding: '0 10px 20px' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}>QApparel Admin</div>
-          <div style={{ fontSize: 12, opacity: 0.55 }}>Super Admin</div>
+        <div style={{ padding: '0 10px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img
+            src="/logo.png"
+            alt="KudiCart"
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              background: '#EBF5FB',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            }}
+          />
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}>KudiCart Admin</div>
+            <div style={{ fontSize: 12, opacity: 0.55 }}>Super Admin</div>
+          </div>
         </div>
         {NAV.map((n) => {
           const Icon = n.icon
@@ -122,6 +137,7 @@ export default function AdminApp() {
           )}
           {section === 'vendors' && <Vendors vendors={vendors} setVendors={setVendors} notify={notify} />}
           {section === 'drivers' && <Drivers drivers={drivers} setDrivers={setDrivers} notify={notify} />}
+          {section === 'darkstore' && <DarkStoreMonitor />}
           {section === 'users' && <ManageUsers notify={notify} />}
           {section === 'categories' && <AdminCategories notify={notify} />}
           {section === 'apparels' && <ApparelsMgmt />}
@@ -147,7 +163,21 @@ function AdminLogin({ onLogin }) {
       <GeometricAccent position="bl" size={140} />
       <div className="card" style={{ width: '100%', maxWidth: 400, padding: 32, zIndex: 1 }}>
         <Link to="/" style={{ fontSize: 13, color: 'var(--muted)' }}>← Portal</Link>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--slate)', margin: '16px 0 8px' }}>Admin Login</h1>
+        <div style={{ margin: '16px 0 8px' }}>
+          <img
+            src="/logo.png"
+            alt="KudiCart"
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              background: '#EBF5FB',
+              boxShadow: '0 6px 16px rgba(47,143,212,0.2)',
+            }}
+          />
+        </div>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--slate)', margin: '0 0 8px' }}>Admin Login</h1>
         <div className="field" style={{ marginBottom: 12 }}><label>Username</label><input placeholder="admin" /></div>
         <div className="field" style={{ marginBottom: 20 }}><label>Password</label><input type="password" placeholder="••••••••" /></div>
         <button type="button" className="btn btn-primary btn-block" onClick={onLogin}>Login</button>
@@ -172,6 +202,181 @@ function AdminDashboard() {
           <div className="value" style={{ fontSize: 26 }}>{value}</div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function DarkStoreMonitor() {
+  const [live, setLive] = useState(true)
+  const [zones, setZones] = useState([
+    { id: 'Zone A', stock: 1240, capacity: 1600, pickers: 6, autoPick: true, lowThreshold: 260 },
+    { id: 'Zone B', stock: 860, capacity: 1400, pickers: 4, autoPick: true, lowThreshold: 240 },
+    { id: 'Zone C', stock: 210, capacity: 900, pickers: 3, autoPick: false, lowThreshold: 220 },
+    { id: 'Zone D', stock: 980, capacity: 1400, pickers: 5, autoPick: true, lowThreshold: 240 },
+  ])
+
+  const [tasks, setTasks] = useState([
+    { id: 'T1', order: 'ORD-20481', zone: 'Zone A', eta: '12 min', status: 'Picking' },
+    { id: 'T2', order: 'ORD-20412', zone: 'Zone B', eta: '18 min', status: 'Queued' },
+    { id: 'T3', order: 'ORD-20463', zone: 'Zone C', eta: '22 min', status: 'Queued' },
+    { id: 'T4', order: 'ORD-20470', zone: 'Zone D', eta: '15 min', status: 'Picking' },
+  ])
+
+  useEffect(() => {
+    if (!live) return
+    const t = setInterval(() => {
+      setZones((prev) =>
+        prev.map((z) => {
+          const wiggle = Math.round((Math.random() - 0.35) * 110)
+          const nextStock = Math.max(0, z.stock + wiggle)
+          return { ...z, stock: nextStock }
+        }),
+      )
+      setTasks((prev) =>
+        prev.map((task) => {
+          if (task.status === 'Delivered') return task
+          if (Math.random() < 0.18) {
+            const nextStatus =
+              task.status === 'Queued' ? 'Picking' : task.status === 'Picking' ? 'Packed' : task.status === 'Packed' ? 'Dispatched' : task.status
+            return { ...task, status: nextStatus }
+          }
+          return task
+        }),
+      )
+    }, 2600)
+    return () => clearInterval(t)
+  }, [live])
+
+  const totalStock = zones.reduce((s, z) => s + z.stock, 0)
+  const pickersOnline = zones.reduce((s, z) => s + z.pickers, 0)
+  const dispatchInProgress = tasks.filter((t) => ['Picking', 'Packed'].includes(t.status)).length
+  const lowZones = zones.filter((z) => z.stock <= z.lowThreshold)
+
+  const advanceTask = (taskId) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== taskId) return t
+        const nextStatus =
+          t.status === 'Queued' ? 'Picking' : t.status === 'Picking' ? 'Packed' : t.status === 'Packed' ? 'Dispatched' : t.status
+        return { ...t, status: nextStatus }
+      }),
+    )
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+        <div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--slate)' }}>
+            Darkstore Monitor
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+            Inventory zones · pickers · dispatch workflow
+          </div>
+        </div>
+        <button
+          type="button"
+          className={live ? 'btn btn-primary' : 'btn btn-ghost'}
+          style={{ height: 42, borderRadius: 12, fontWeight: 700, padding: '0 16px' }}
+          onClick={() => setLive((v) => !v)}
+        >
+          {live ? 'Live: ON' : 'Live: OFF'}
+        </button>
+      </div>
+
+      <div className="stat-grid" style={{ marginBottom: 8 }}>
+        <DarkStat label="Inventory SKUs" value={`${zones.length * 180}`} />
+        <DarkStat label="Available Stock" value={totalStock.toLocaleString('en-IN')} />
+        <DarkStat label="Pickers Online" value={pickersOnline} />
+        <DarkStat label="Dispatch In Progress" value={dispatchInProgress} />
+      </div>
+
+      <div style={{ marginTop: 18, marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, color: 'var(--slate)' }}>Zones</div>
+        {lowZones.length > 0 ? (
+          <span className="badge badge-danger">{lowZones.length} low-stock alert(s)</span>
+        ) : (
+          <span className="badge badge-teal">Stock healthy</span>
+        )}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+        {zones.map((z) => {
+          const pct = Math.max(0, Math.min(1, z.stock / z.capacity))
+          const isLow = z.stock <= z.lowThreshold
+          return (
+            <div key={z.id} className="card" style={{ padding: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--slate)' }}>{z.id}</div>
+                {isLow ? <span className="badge badge-danger">Low</span> : <span className="badge badge-teal">OK</span>}
+              </div>
+
+              <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10 }}>
+                Stock: <strong style={{ color: 'var(--ink)' }}>{z.stock.toLocaleString('en-IN')}</strong> / {z.capacity.toLocaleString('en-IN')} · Pickers:{' '}
+                <strong style={{ color: 'var(--ink)' }}>{z.pickers}</strong>
+              </div>
+
+              <div style={{ height: 10, borderRadius: 999, background: 'var(--line)', overflow: 'hidden', marginBottom: 12 }}>
+                <div
+                  style={{
+                    width: `${Math.round(pct * 100)}%`,
+                    height: '100%',
+                    background: 'var(--brand-grad)',
+                    borderRadius: 999,
+                  }}
+                />
+              </div>
+
+              <button
+                type="button"
+                className={z.autoPick ? 'btn btn-primary' : 'btn btn-ghost'}
+                style={{ height: 40, borderRadius: 12, fontWeight: 700, width: '100%' }}
+                onClick={() =>
+                  setZones((prev) => prev.map((x) => (x.id === z.id ? { ...x, autoPick: !x.autoPick } : x)))
+                }
+              >
+                {z.autoPick ? 'Auto-pick: ON' : 'Auto-pick: OFF'}
+              </button>
+            </div>
+          )
+        })}
+      </div>
+
+      <div style={{ marginTop: 22, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, color: 'var(--slate)', marginBottom: 12 }}>
+        Fulfillment Tasks
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
+        {tasks.map((t) => (
+          <div key={t.id} className="card" style={{ padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--slate)' }}>
+                {t.order} · <span style={{ color: 'var(--muted)', fontWeight: 600 }}>{t.zone}</span>
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                ETA: {t.eta} · Status: <strong style={{ color: 'var(--ink)' }}>{t.status}</strong>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ height: 40, borderRadius: 12, fontWeight: 700, padding: '0 14px' }}
+              onClick={() => advanceTask(t.id)}
+              disabled={t.status === 'Dispatched'}
+            >
+              {t.status === 'Queued' ? 'Start' : t.status === 'Picking' ? 'Mark Packed' : t.status === 'Packed' ? 'Dispatch' : 'Done'}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DarkStat({ label, value }) {
+  return (
+    <div className="stat-card">
+      <div className="label">{label}</div>
+      <div className="value" style={{ fontSize: 26 }}>{value}</div>
     </div>
   )
 }
@@ -508,7 +713,7 @@ function AdminSettings({ notify }) {
     <div style={{ display: 'grid', gap: 16, maxWidth: 640 }}>
       <div className="card" style={{ padding: 24 }}>
         <h3 style={{ fontFamily: 'var(--font-display)', marginBottom: 16 }}>SEO Settings</h3>
-        <div className="field" style={{ marginBottom: 12 }}><label>Meta Title</label><input defaultValue="QApparel — Quick Apparel Delivery" /></div>
+        <div className="field" style={{ marginBottom: 12 }}><label>Meta Title</label><input defaultValue="KudiCart — Quick Apparel Delivery" /></div>
         <div className="field" style={{ marginBottom: 12 }}><label>Meta Description</label><textarea defaultValue="Browse and order apparel with fast delivery." /></div>
         <div className="field"><label>Keywords</label><input defaultValue="apparel, fashion, q-commerce" /></div>
       </div>

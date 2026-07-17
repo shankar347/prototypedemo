@@ -131,7 +131,20 @@ function DriverLogin({ onSend }) {
     <div className="paper-bg" style={{ minHeight: '100%', position: 'relative', overflow: 'hidden', padding: '64px 28px' }}>
       <GeometricAccent position="tr" size={150} />
       <Link to="/" style={{ fontSize: 13, color: 'var(--muted)' }}>← Portal</Link>
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, color: 'var(--slate)', margin: '28px 0 8px' }}>
+      <div style={{ marginBottom: 20 }}>
+        <img
+          src="/logo.png"
+          alt="KudiCart"
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            objectFit: 'cover',
+            background: '#EBF5FB',
+          }}
+        />
+      </div>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: 'var(--slate)', margin: '0 0 8px' }}>
         Driver Login
       </h1>
       <p style={{ color: 'var(--muted)', marginBottom: 28 }}>Enter registered phone — unique OTP will be generated</p>
@@ -167,7 +180,7 @@ function DriverHome({ online, setOnline, requests, active, stage, onAccept, onRe
     <div className="fade-in">
       <header
         style={{
-          background: 'linear-gradient(135deg, #00c09f, #1a535c)',
+          background: 'linear-gradient(135deg, #7bd5f5, #1e4a6e)',
           color: 'white',
           padding: '18px 16px 20px',
           position: 'relative',
@@ -176,9 +189,22 @@ function DriverHome({ online, setOnline, requests, active, stage, onAccept, onRe
       >
         <GeometricAccent position="tr" size={100} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20 }}>QApparel Driver</div>
-            <div style={{ fontSize: 13, opacity: 0.85 }}>Kiran P · Bike</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img
+              src="/logo.png"
+              alt="KudiCart"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                background: '#EBF5FB',
+              }}
+            />
+            <div>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}>KudiCart Driver</div>
+              <div style={{ fontSize: 13, opacity: 0.85 }}>Kiran P · Bike</div>
+            </div>
           </div>
           <button
             type="button"
@@ -314,12 +340,12 @@ function MapScreen({ active }) {
         {/* Decorative map grid */}
         <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.35 }}>
           {Array.from({ length: 12 }).map((_, i) => (
-            <line key={`h${i}`} x1="0" y1={i * 40} x2="500" y2={i * 40} stroke="#1a535c" strokeWidth="1" />
+            <line key={`h${i}`} x1="0" y1={i * 40} x2="500" y2={i * 40} stroke="#1e4a6e" strokeWidth="1" />
           ))}
           {Array.from({ length: 10 }).map((_, i) => (
-            <line key={`v${i}`} x1={i * 45} y1="0" x2={i * 45} y2="500" stroke="#1a535c" strokeWidth="1" />
+            <line key={`v${i}`} x1={i * 45} y1="0" x2={i * 45} y2="500" stroke="#1e4a6e" strokeWidth="1" />
           ))}
-          <path d="M40 360 Q120 200 200 280 T380 120" fill="none" stroke="#00c09f" strokeWidth="4" strokeDasharray="8 6" />
+          <path d="M40 360 Q120 200 200 280 T380 120" fill="none" stroke="#4db8e8" strokeWidth="4" strokeDasharray="8 6" />
         </svg>
         <div className="card" style={{ padding: 16, zIndex: 1, textAlign: 'center', maxWidth: 280 }}>
           <Navigation size={28} color="var(--teal)" style={{ margin: '0 auto 8px' }} />
@@ -341,7 +367,7 @@ function SupportScreen({ notify }) {
   ])
   return (
     <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-      <header style={{ padding: 16, background: 'linear-gradient(135deg, #00c09f, #1a535c)', color: 'white' }}>
+      <header style={{ padding: 16, background: 'linear-gradient(135deg, #7bd5f5, #1e4a6e)', color: 'white' }}>
         <h2 style={{ fontFamily: 'var(--font-display)' }}>Support & Safety</h2>
       </header>
       <div style={{ padding: 16, flex: 1 }}>

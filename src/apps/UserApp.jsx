@@ -20,11 +20,15 @@ import {
   Heart,
   Filter,
 } from 'lucide-react'
-import { PhoneShell, BottomNav, GeometricAccent, Stars } from '../components/ui'
+import { PhoneShell, BottomNav, GeometricAccent, Stars, BrandLogo } from '../components/ui'
 import { useApp } from '../context/AppContext'
 import {
   BANNERS,
   CATEGORIES,
+  QUICK_CATEGORIES,
+  COMBOS,
+  BRANDS,
+  COUPONS,
   formatINR,
 } from '../data/mockData'
 
@@ -130,7 +134,7 @@ function AppHeader({ title, onBack, right, compact }) {
         position: 'sticky',
         top: 0,
         zIndex: 20,
-        background: 'linear-gradient(135deg, #00c09f 0%, #13b59d 55%, #1a535c 160%)',
+        background: 'linear-gradient(135deg, #7bd5f5 0%, #4db8e8 45%, #1e4a6e 160%)',
         color: 'white',
         padding: compact ? '14px 16px' : '18px 16px 20px',
         overflow: 'hidden',
@@ -143,8 +147,22 @@ function AppHeader({ title, onBack, right, compact }) {
             <ArrowLeft size={22} />
           </button>
         ) : (
-          <Link to="/" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>
-            QApparel
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img
+              src="/logo.png"
+              alt="KudiCart"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                background: '#EBF5FB',
+                boxShadow: '0 4px 12px rgba(15, 36, 56, 0.2)',
+              }}
+            />
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19, letterSpacing: '-0.02em' }}>
+              KudiCart
+            </span>
           </Link>
         )}
         {title && onBack && (
@@ -165,9 +183,9 @@ function LoginScreen({ onSend }) {
       <GeometricAccent position="bl" size={120} />
       <div style={{ padding: '72px 28px 40px', position: 'relative', zIndex: 1 }} className="fade-in">
         <Link to="/" style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}>← All apps</Link>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 800, color: 'var(--slate)', margin: '28px 0 8px' }}>
-          QApparel
-        </h1>
+        <div style={{ margin: '28px 0 12px' }}>
+          <BrandLogo size={64} withName />
+        </div>
         <p style={{ color: 'var(--muted)', marginBottom: 36, lineHeight: 1.5 }}>
           Enter your mobile number to browse & order apparel with OTP verification.
         </p>
@@ -262,6 +280,14 @@ function HomeScreen({ go }) {
   }, [])
 
   const b = BANNERS[banner]
+  const bestElectronics = ctx.products
+    .filter((p) => p.category === 'electronics')
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 6)
+  const bestGroceries = ctx.products
+    .filter((p) => p.category === 'groceries')
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 6)
 
   return (
     <div className="fade-in">
@@ -291,94 +317,266 @@ function HomeScreen({ go }) {
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <Search size={18} /> Search apparels, brands…
+          <Search size={18} /> Search products, brands…
         </button>
 
         <div
           className="card"
           style={{
-            padding: 22,
-            marginBottom: 20,
-            background:
-              b.tone === 'slate'
-                ? 'linear-gradient(135deg, #1a535c, #0d3b40)'
-                : b.tone === 'mint'
-                  ? 'linear-gradient(135deg, #b8f0e4, #00c09f)'
-                  : 'linear-gradient(135deg, #00c09f, #1a535c)',
-            color: b.tone === 'mint' ? 'var(--slate)' : 'white',
+            padding: 0,
+            marginBottom: 18,
             position: 'relative',
             overflow: 'hidden',
-            minHeight: 140,
+            minHeight: 148,
+            border: 'none',
           }}
         >
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, marginBottom: 6 }}>{b.title}</h3>
-          <p style={{ opacity: 0.9, marginBottom: 14, fontSize: 14 }}>{b.subtitle}</p>
-          <button
-            type="button"
-            className="btn"
+          <img
+            src={b.image}
+            alt={b.title}
             style={{
-              height: 36,
-              padding: '0 16px',
-              background: b.tone === 'mint' ? 'var(--slate)' : 'white',
-              color: b.tone === 'mint' ? 'white' : 'var(--slate)',
-              fontSize: 13,
-              borderRadius: 10,
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
             }}
-            onClick={() => go('search')}
-          >
-            {b.cta}
-          </button>
-          <div style={{ display: 'flex', gap: 6, marginTop: 16 }}>
-            {BANNERS.map((_, i) => (
-              <span
-                key={i}
-                style={{
-                  width: i === banner ? 18 : 6,
-                  height: 6,
-                  borderRadius: 99,
-                  background: i === banner ? (b.tone === 'mint' ? 'var(--slate)' : 'white') : 'rgba(255,255,255,0.4)',
-                  transition: 'width 0.3s',
-                }}
-              />
-            ))}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(105deg, rgba(15,36,56,0.82) 0%, rgba(15,36,56,0.45) 55%, rgba(15,36,56,0.2) 100%)',
+            }}
+          />
+          <div style={{ position: 'relative', zIndex: 1, padding: '18px 16px 14px', color: 'white' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, marginBottom: 6 }}>{b.title}</h3>
+            <p style={{ opacity: 0.92, marginBottom: 12, fontSize: 13 }}>{b.subtitle}</p>
+            <button
+              type="button"
+              className="btn"
+              style={{
+                height: 34,
+                padding: '0 14px',
+                background: 'white',
+                color: 'var(--slate)',
+                fontSize: 12,
+                borderRadius: 10,
+              }}
+              onClick={() => go('search')}
+            >
+              {b.cta}
+            </button>
+            <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
+              {BANNERS.map((_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: i === banner ? 16 : 6,
+                    height: 6,
+                    borderRadius: 99,
+                    background: i === banner ? 'white' : 'rgba(255,255,255,0.45)',
+                    transition: 'width 0.3s',
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        <SectionTitle title="Categories" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
-          {CATEGORIES.map((c) => (
+        <SectionTitle title="Quick commerce" />
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 10,
+            marginBottom: 20,
+          }}
+        >
+          {QUICK_CATEGORIES.map((c) => (
             <button
               key={c.id}
               type="button"
+              onClick={() => {
+                sessionStorage.setItem('searchCat', c.cat)
+                go('search')
+              }}
+              style={{
+                background: 'white',
+                border: '1px solid var(--line)',
+                borderRadius: 14,
+                padding: '8px 4px 10px',
+                textAlign: 'center',
+                position: 'relative',
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
+              {c.badge && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 4,
+                    right: 4,
+                    fontSize: 8,
+                    fontWeight: 700,
+                    background: '#ff6b6b',
+                    color: 'white',
+                    borderRadius: 6,
+                    padding: '2px 4px',
+                  }}
+                >
+                  {c.badge}
+                </span>
+              )}
+              <img
+                src={c.image}
+                alt={c.name}
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+                  e.currentTarget.src =
+                    'https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=200&h=200&fit=crop'
+                }}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  objectFit: 'cover',
+                  margin: '0 auto 6px',
+                  display: 'block',
+                }}
+              />
+              <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--slate)', lineHeight: 1.25 }}>{c.name}</div>
+            </button>
+          ))}
+        </div>
+
+        <SectionTitle title="Combo deals" action="View all" onAction={() => go('search')} />
+        <div className="no-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 16, marginBottom: 18 }}>
+          {COMBOS.map((combo) => (
+            <button
+              key={combo.id}
+              type="button"
               className="card"
               onClick={() => go('search')}
-              style={{ padding: 0, textAlign: 'center', overflow: 'hidden' }}
+              style={{
+                flex: '0 0 auto',
+                width: 220,
+                padding: 0,
+                overflow: 'hidden',
+                textAlign: 'left',
+                border: 'none',
+              }}
             >
-              <div
-                style={{
-                  width: '100%',
-                  aspectRatio: '1',
-                  overflow: 'hidden',
-                  background: 'var(--teal-light)',
-                }}
-              >
+              <div style={{ position: 'relative', height: 96 }}>
                 <img
-                  src={c.image}
-                  alt={c.name}
+                  src={combo.image}
+                  alt={combo.title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    left: 8,
+                    background: 'rgba(15,36,56,0.85)',
+                    color: 'white',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    borderRadius: 8,
+                    padding: '3px 8px',
+                  }}
+                >
+                  {combo.tag}
+                </span>
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--slate)', padding: '8px 6px 10px' }}>
-                {c.name}
+              <div style={{ padding: '10px 12px 12px' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--slate)' }}>{combo.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--muted)', margin: '2px 0 6px' }}>{combo.subtitle}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontWeight: 700, color: 'var(--teal-dark)', fontSize: 13 }}>{formatINR(combo.price)}</span>
+                  <span style={{ fontSize: 11, color: 'var(--muted)', textDecoration: 'line-through' }}>{formatINR(combo.mrp)}</span>
+                </div>
               </div>
             </button>
           ))}
         </div>
 
-        <SectionTitle title="Best Selling Apparels" action="See all" onAction={() => go('search')} />
+        <SectionTitle title="Shop by category" />
+        <div className="no-scrollbar" style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 10, marginBottom: 22 }}>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              className="chip"
+              onClick={() => {
+                sessionStorage.setItem('searchCat', c.id)
+                go('search')
+              }}
+              style={{ flex: '0 0 auto', borderRadius: 999, padding: '10px 14px', gap: 10 }}
+            >
+              <img
+                src={c.image}
+                alt={c.name}
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop'
+                }}
+                style={{ width: 30, height: 30, borderRadius: 10, objectFit: 'cover', border: '1.5px solid rgba(212,232,242,0.9)' }}
+              />
+              {c.name}
+            </button>
+          ))}
+        </div>
+
+        <SectionTitle title="Top Featured Brands" action="View all" onAction={() => go('search')} />
+        <div className="no-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 14, marginBottom: 22 }}>
+          {BRANDS.map((br) => (
+            <button
+              key={br.id}
+              type="button"
+              className="card"
+              onClick={() => {
+                sessionStorage.setItem('searchBrand', br.filterBrand || br.name)
+                go('search')
+              }}
+              style={{ flex: '0 0 auto', width: 140, padding: 10, textAlign: 'center' }}
+            >
+              <img
+                src={br.image}
+                alt={br.name}
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=260&h=160&fit=crop'
+                }}
+                style={{ width: '100%', height: 74, objectFit: 'cover', borderRadius: 10, marginBottom: 8 }}
+              />              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--slate)' }}>{br.name}</div>
+            </button>
+          ))}
+        </div>
+
+        <SectionTitle title="Best Electronics" action="View all" onAction={() => go('search')} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingBottom: 18 }}>
+          {bestElectronics.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              onClick={() => {
+                sessionStorage.setItem('pid', p.id)
+                go('product')
+              }}
+            />
+          ))}
+        </div>
+
+        <SectionTitle title="Best Groceries" action="View all" onAction={() => go('search')} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingBottom: 24 }}>
-          {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} onClick={() => { sessionStorage.setItem('pid', p.id); go('product') }} />
+          {bestGroceries.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              onClick={() => {
+                sessionStorage.setItem('pid', p.id)
+                go('product')
+              }}
+            />
           ))}
         </div>
       </div>
@@ -400,10 +598,22 @@ function SectionTitle({ title, action, onAction }) {
 }
 
 function ProductCard({ product, onClick }) {
+  const fallbackByCategory = {
+    electronics: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=500&fit=crop',
+    groceries: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=500&fit=crop',
+    home: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=500&fit=crop',
+  }
   return (
     <button type="button" className="card" onClick={onClick} style={{ textAlign: 'left', overflow: 'hidden', padding: 0 }}>
       <div style={{ aspectRatio: '4/5', background: '#e8f0ef', overflow: 'hidden' }}>
-        <img src={product.image} alt={product.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img
+          src={product.image}
+          alt={product.title}
+          onError={(e) => {
+            e.currentTarget.src = fallbackByCategory[product.category] || fallbackByCategory.electronics
+          }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
       </div>
       <div style={{ padding: 10 }}>
         <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 2 }}>{product.brand}</div>
@@ -421,6 +631,20 @@ function SearchScreen({ go }) {
   const ctx = useApp()
   const [q, setQ] = useState('')
   const [cat, setCat] = useState('all')
+
+  useEffect(() => {
+    const initCat = sessionStorage.getItem('searchCat')
+    if (initCat) {
+      setCat(initCat)
+      sessionStorage.removeItem('searchCat')
+    }
+    const initBrand = sessionStorage.getItem('searchBrand')
+    if (initBrand) {
+      setQ(initBrand)
+      sessionStorage.removeItem('searchBrand')
+    }
+  }, [])
+
   const filters = useMemo(() => {
     if (!q) return []
     const s = q.toLowerCase()
@@ -445,7 +669,7 @@ function SearchScreen({ go }) {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search apparels…"
+            placeholder="Search products…"
             style={{
               width: '100%',
               height: 48,
@@ -466,7 +690,7 @@ function SearchScreen({ go }) {
             ))}
           </div>
         )}
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
+        <div className="no-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
           <button type="button" className={`chip ${cat === 'all' ? 'active' : ''}`} onClick={() => setCat('all')}>
             All
           </button>
@@ -481,7 +705,7 @@ function SearchScreen({ go }) {
             <ProductCard key={p.id} product={p} onClick={() => { sessionStorage.setItem('pid', p.id); go('product') }} />
           ))}
         </div>
-        {list.length === 0 && <div className="empty">No apparels found</div>}
+        {list.length === 0 && <div className="empty">No items found</div>}
       </div>
     </div>
   )
@@ -490,8 +714,10 @@ function SearchScreen({ go }) {
 function ProductScreen({ go, back }) {
   const ctx = useApp()
   const product = ctx.products.find((p) => p.id === sessionStorage.getItem('pid')) || ctx.products[0]
-  const [size, setSize] = useState(product.sizes[0])
-  const [color, setColor] = useState(product.colors[0])
+  const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0
+  const hasColors = Array.isArray(product.colors) && product.colors.length > 0
+  const [size, setSize] = useState(() => (hasSizes ? product.sizes[0] : 'Standard'))
+  const [color, setColor] = useState(() => (hasColors ? product.colors[0] : 'Standard'))
 
   return (
     <div className="fade-in">
@@ -512,22 +738,30 @@ function ProductScreen({ go, back }) {
           <span className="badge badge-teal">{Math.round(((product.mrp - product.price) / product.mrp) * 100)}% off</span>
         </div>
         <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.55, marginBottom: 20 }}>{product.description}</p>
-        <Label>Size</Label>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-          {product.sizes.map((s) => (
-            <button key={s} type="button" className={`chip ${size === s ? 'active' : ''}`} onClick={() => setSize(s)}>
-              {s}
-            </button>
-          ))}
-        </div>
-        <Label>Color</Label>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-          {product.colors.map((c) => (
-            <button key={c} type="button" className={`chip ${color === c ? 'active' : ''}`} onClick={() => setColor(c)}>
-              {c}
-            </button>
-          ))}
-        </div>
+        {hasSizes && (
+          <>
+            <Label>Size</Label>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+              {product.sizes.map((s) => (
+                <button key={s} type="button" className={`chip ${size === s ? 'active' : ''}`} onClick={() => setSize(s)}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        {hasColors && (
+          <>
+            <Label>Color</Label>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+              {product.colors.map((c) => (
+                <button key={c} type="button" className={`chip ${color === c ? 'active' : ''}`} onClick={() => setColor(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, paddingBottom: 24 }}>
           <button type="button" className="btn btn-secondary" onClick={() => ctx.addToCart(product, size, color)}>
             Add to Cart
@@ -566,7 +800,7 @@ function CartScreen({ go }) {
             <ShoppingCart size={40} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
             Your cart is empty
             <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => go('home')}>
-              Browse Apparels
+              Browse Items
             </button>
           </div>
         ) : (
@@ -646,35 +880,78 @@ function CheckoutScreen({ go, back }) {
   const ctx = useApp()
   const [code, setCode] = useState('')
   const [pay, setPay] = useState('UPI')
+  const activeCoupons = COUPONS.filter((c) => c.active)
 
   return (
     <div className="fade-in">
       <AppHeader title="Checkout" onBack={back} />
       <div style={{ padding: 16 }}>
-        <div className="card" style={{ padding: 16, marginBottom: 16 }}>
-          <h4 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: 12 }}>Promo Code</h4>
+        <div
+          className="card"
+          style={{
+            padding: 16,
+            marginBottom: 16,
+            borderColor: 'rgba(91,44,255,0.25)',
+            background: 'linear-gradient(180deg, rgba(91,44,255,0.07) 0%, rgba(255,255,255,0.9) 100%)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <h4 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, marginBottom: 0, color: 'var(--slate)' }}>Coupons</h4>
+            {activeCoupons.length > 0 && (
+              <span className="badge badge-slate" style={{ background: 'rgba(91,44,255,0.08)', color: '#5b2cff' }}>
+                {activeCoupons.length} available
+              </span>
+            )}
+          </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
-              placeholder="TEAL100 / SUMMER20"
-              style={{ flex: 1, height: 44, borderRadius: 10, border: '1.5px solid var(--line)', padding: '0 12px' }}
+              placeholder="Enter Coupon Code"
+              style={{ flex: 1, height: 44, borderRadius: 12, border: '1.5px solid var(--line)', padding: '0 12px' }}
             />
             <button
               type="button"
-              className="btn btn-secondary"
-              style={{ height: 44 }}
+              className="btn"
+              style={{
+                height: 44,
+                borderRadius: 12,
+                background: '#5b2cff',
+                color: 'white',
+                fontWeight: 800,
+                padding: '0 16px',
+              }}
               onClick={() => {
-                if (['TEAL100', 'SUMMER20', 'FREESHIP'].includes(code)) {
+                const ok = ['TEAL100', 'SUMMER20', 'FREESHIP'].includes(code)
+                if (ok) {
                   ctx.setPromo(code)
-                  ctx.showToast('Promo applied')
-                } else ctx.showToast('Invalid promo code')
+                  ctx.showToast('Coupon applied')
+                } else ctx.showToast('Invalid coupon')
               }}
             >
-              Apply
+              Check
             </button>
           </div>
-          {ctx.promo && <p style={{ marginTop: 8, fontSize: 13, color: 'var(--teal-dark)' }}>Applied: {ctx.promo}</p>}
+
+          {ctx.promo && (
+            <p style={{ marginTop: 10, fontSize: 13, fontWeight: 700, color: '#5b2cff' }}>
+              Unlocked: {ctx.promo}
+            </p>
+          )}
+
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingTop: 10 }}>
+            {activeCoupons.slice(0, 5).map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className="chip"
+                style={{ padding: '9px 12px', borderColor: 'rgba(91,44,255,0.25)' }}
+                onClick={() => setCode(c.code)}
+              >
+                {c.code}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="card" style={{ padding: 16, marginBottom: 16 }}>

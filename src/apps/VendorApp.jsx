@@ -76,7 +76,18 @@ export default function VendorApp() {
     <div className="panel-layout">
       <aside className={`panel-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px 24px' }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--teal)', display: 'grid', placeItems: 'center', fontWeight: 800 }}>Q</div>
+          <img
+            src="/logo.png"
+            alt="KudiCart"
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              background: '#EBF5FB',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            }}
+          />
           <div>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Vendor Panel</div>
             <div style={{ fontSize: 12, opacity: 0.6 }}>Coastline Boutique</div>
@@ -165,7 +176,20 @@ function VendorLogin({ onLogin, onForgot, onCreate, toast }) {
       <GeometricAccent position="bl" size={160} />
       <div className="card" style={{ width: '100%', maxWidth: 420, padding: 32, position: 'relative', zIndex: 1 }}>
         <Link to="/" style={{ fontSize: 13, color: 'var(--muted)' }}>← Portal</Link>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--slate)', margin: '16px 0 8px' }}>Vendor Login</h1>
+        <div style={{ margin: '16px 0 8px' }}>
+          <img
+            src="/logo.png"
+            alt="KudiCart"
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              background: '#EBF5FB',
+            }}
+          />
+        </div>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--slate)', margin: '0 0 8px' }}>Vendor Login</h1>
         <p style={{ color: 'var(--muted)', marginBottom: 24, fontSize: 14 }}>Sign in with username & password</p>
         <div className="field" style={{ marginBottom: 14 }}>
           <label>Username</label>

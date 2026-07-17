@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { GeometricAccent } from '../components/ui'
+import { GeometricAccent, BrandLogo } from '../components/ui'
 import { ShoppingBag, Store, Bike, Shield } from 'lucide-react'
 
 const apps = [
@@ -8,28 +8,28 @@ const apps = [
     title: 'Customer App',
     desc: 'Browse apparel, cart, checkout, orders & profile',
     icon: ShoppingBag,
-    color: '#00c09f',
+    color: '#4db8e8',
   },
   {
     to: '/vendor',
     title: 'Vendor Panel',
     desc: 'Manage shop, inventory, orders & payouts',
     icon: Store,
-    color: '#13b59d',
+    color: '#2f8fd4',
   },
   {
     to: '/driver',
     title: 'Driver App',
     desc: 'Accept deliveries, navigate & confirm drops',
     icon: Bike,
-    color: '#1a535c',
+    color: '#1e4a6e',
   },
   {
     to: '/admin',
     title: 'Admin Panel',
     desc: 'Customers, vendors, drivers, coupons & more',
     icon: Shield,
-    color: '#0d3b40',
+    color: '#143552',
   },
 ]
 
@@ -41,8 +41,11 @@ export default function Portal() {
 
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '64px 24px 80px', position: 'relative', zIndex: 1 }}>
         <header style={{ marginBottom: 48 }} className="fade-in">
+          <div style={{ marginBottom: 20 }}>
+            <BrandLogo size={72} />
+          </div>
           <p style={{ color: 'var(--teal-dark)', fontWeight: 700, letterSpacing: '0.08em', fontSize: 13, textTransform: 'uppercase', marginBottom: 12 }}>
-            Q-Commerce Platform
+            Quick Commerce Platform
           </p>
           <h1
             style={{
@@ -54,7 +57,7 @@ export default function Portal() {
               marginBottom: 16,
             }}
           >
-            QApparel
+            KudiCart
           </h1>
           <p style={{ maxWidth: 520, color: 'var(--muted)', fontSize: 17, lineHeight: 1.6 }}>
             Apparel ordering & delivery — browse, buy, and track. Pick a role below to explore the full UI experience.
@@ -85,7 +88,7 @@ export default function Portal() {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)'
-                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(26,83,92,0.12)'
+                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(47,143,212,0.16)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = ''
