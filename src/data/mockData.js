@@ -49,7 +49,7 @@ export const CATEGORIES = [
   },
   {
     id: 'home',
-    name: 'Home & Living',
+    name: 'Home',
     image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=300&fit=crop',
     sub: ['Lighting', 'Storage', 'Home Care', 'Decor'],
   },

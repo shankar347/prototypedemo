@@ -529,7 +529,7 @@ function HomeScreen({ go }) {
         </div>
 
         <SectionTitle title="Shop by category" />
-        <div className="no-scrollbar" style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 10, marginBottom: 22 }}>
+        <div className="filter-row" style={{ marginBottom: 22 }}>
           {CATEGORIES.map((c) => (
             <button
               key={c.id}
@@ -539,17 +539,17 @@ function HomeScreen({ go }) {
                 sessionStorage.setItem('searchCat', c.id)
                 go('search')
               }}
-              style={{ flex: '0 0 auto', borderRadius: 999, padding: '10px 14px', gap: 10 }}
+              style={{ height: 44, padding: '8px 14px' }}
             >
               <img
                 src={c.image}
-                alt={c.name}
+                alt=""
                 onError={(e) => {
                   e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop'
                 }}
-                style={{ width: 30, height: 30, borderRadius: 10, objectFit: 'cover', border: '1.5px solid rgba(212,232,242,0.9)' }}
+                style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
               />
-              {c.name}
+              <span>{c.name}</span>
             </button>
           ))}
         </div>
@@ -717,7 +717,7 @@ function SearchScreen({ go }) {
             ))}
           </div>
         )}
-        <div className="no-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
+        <div className="filter-row">
           <button type="button" className={`chip ${cat === 'all' ? 'active' : ''}`} onClick={() => setCat('all')}>
             All
           </button>
