@@ -274,8 +274,8 @@ img {
   width: 100%;
   max-width: none;
   margin: 0;
-  min-height: auto;
-  min-height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   position: relative;
   display: flex;
@@ -311,8 +311,8 @@ img {
   }
 
   .phone-shell {
-    width: 300px;
-    max-width: 300px;
+    width: 390px;
+    max-width: 390px;
     height: min(720px, calc(100dvh - 32px));
     min-height: 0;
     max-height: calc(100dvh - 32px);
@@ -329,6 +329,9 @@ img {
 .phone-scroll {
   flex: 1;
   min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -340,6 +343,11 @@ img {
   width: 0;
   height: 0;
   display: none;
+}
+
+.phone-scroll > * {
+  flex: 1 0 auto;
+  min-height: 100%;
 }
 
 .bottom-nav {

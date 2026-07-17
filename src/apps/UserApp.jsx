@@ -178,10 +178,21 @@ function AppHeader({ title, onBack, right, compact }) {
 function LoginScreen({ onSend }) {
   const [phone, setPhone] = useState('')
   return (
-    <div className="paper-bg" style={{ minHeight: '100%', position: 'relative', overflow: 'hidden' }}>
+    <div
+      className="paper-bg"
+      style={{
+        minHeight: '100%',
+        height: '100%',
+        flex: 1,
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <GeometricAccent position="tr" size={160} />
       <GeometricAccent position="bl" size={120} />
-      <div style={{ padding: '72px 28px 40px', position: 'relative', zIndex: 1 }} className="fade-in">
+      <div style={{ padding: '72px 28px 48px', position: 'relative', zIndex: 1, flex: 1 }} className="fade-in">
         <Link to="/" style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}>← All apps</Link>
         <div style={{ margin: '28px 0 12px' }}>
           <BrandLogo size={64} withName />
@@ -220,51 +231,67 @@ function OtpScreen({ onBack, onVerify }) {
   const [otp, setOtp] = useState(['', '', '', ''])
   const code = otp.join('')
   return (
-    <div className="paper-bg fade-in" style={{ minHeight: '100%', padding: '24px' }}>
-      <button type="button" onClick={onBack} style={{ color: 'var(--slate)', marginBottom: 32 }}>
-        <ArrowLeft size={22} />
-      </button>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--slate)' }}>Verify OTP</h2>
-      <p style={{ color: 'var(--muted)', margin: '8px 0 28px' }}>Enter the 4-digit code sent to your mobile</p>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
-        {otp.map((d, i) => (
-          <input
-            key={i}
-            value={d}
-            maxLength={1}
-            inputMode="numeric"
-            onChange={(e) => {
-              const v = e.target.value.replace(/\D/g, '').slice(-1)
-              const next = [...otp]
-              next[i] = v
-              setOtp(next)
-              if (v && e.target.nextSibling) e.target.nextSibling.focus()
-            }}
-            style={{
-              width: 56,
-              height: 56,
-              textAlign: 'center',
-              fontSize: 22,
-              fontWeight: 700,
-              border: '1.5px solid var(--line)',
-              borderRadius: 12,
-              outline: 'none',
-            }}
-          />
-        ))}
+    <div
+      className="paper-bg fade-in"
+      style={{
+        minHeight: '100%',
+        height: '100%',
+        flex: 1,
+        padding: '24px',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <GeometricAccent position="tr" size={140} />
+      <GeometricAccent position="bl" size={100} />
+      <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
+        <button type="button" onClick={onBack} style={{ color: 'var(--slate)', marginBottom: 32 }}>
+          <ArrowLeft size={22} />
+        </button>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--slate)' }}>Verify OTP</h2>
+        <p style={{ color: 'var(--muted)', margin: '8px 0 28px' }}>Enter the 4-digit code sent to your mobile</p>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
+          {otp.map((d, i) => (
+            <input
+              key={i}
+              value={d}
+              maxLength={1}
+              inputMode="numeric"
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, '').slice(-1)
+                const next = [...otp]
+                next[i] = v
+                setOtp(next)
+                if (v && e.target.nextSibling) e.target.nextSibling.focus()
+              }}
+              style={{
+                width: 56,
+                height: 56,
+                textAlign: 'center',
+                fontSize: 22,
+                fontWeight: 700,
+                border: '1.5px solid var(--line)',
+                borderRadius: 12,
+                outline: 'none',
+              }}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary btn-block"
+          disabled={code.length < 4}
+          style={{ opacity: code.length < 4 ? 0.5 : 1 }}
+          onClick={() => onVerify('+91 98765 43210')}
+        >
+          Verify & Continue
+        </button>
+        <p style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--muted)' }}>
+          Demo tip: enter any 4 digits
+        </p>
       </div>
-      <button
-        type="button"
-        className="btn btn-primary btn-block"
-        disabled={code.length < 4}
-        style={{ opacity: code.length < 4 ? 0.5 : 1 }}
-        onClick={() => onVerify('+91 98765 43210')}
-      >
-        Verify & Continue
-      </button>
-      <p style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--muted)' }}>
-        Demo tip: enter any 4 digits
-      </p>
     </div>
   )
 }
