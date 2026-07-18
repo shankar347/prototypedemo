@@ -8,28 +8,28 @@ const apps = [
     title: 'Customer App',
     desc: 'Browse apparel, cart, checkout, orders & profile',
     icon: ShoppingBag,
-    color: '#4db8e8',
+    color: '#fb7185',
   },
   {
     to: '/vendor',
     title: 'Vendor Panel',
     desc: 'Manage shop, inventory, orders & payouts',
     icon: Store,
-    color: '#2f8fd4',
+    color: '#e11d48',
   },
   {
     to: '/driver',
     title: 'Driver App',
     desc: 'Accept deliveries, navigate & confirm drops',
     icon: Bike,
-    color: '#1e4a6e',
+    color: '#be123c',
   },
   {
     to: '/admin',
     title: 'Admin Panel',
     desc: 'Customers, vendors, drivers, coupons & more',
     icon: Shield,
-    color: '#143552',
+    color: '#881337',
   },
 ]
 

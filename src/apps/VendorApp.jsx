@@ -84,7 +84,7 @@ export default function VendorApp() {
               height: 42,
               borderRadius: '50%',
               objectFit: 'cover',
-              background: '#EBF5FB',
+              background: '#FFF1F2',
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
             }}
           />
@@ -185,7 +185,7 @@ function VendorLogin({ onLogin, onForgot, onCreate, toast }) {
               height: 56,
               borderRadius: '50%',
               objectFit: 'cover',
-              background: '#EBF5FB',
+              background: '#FFF1F2',
             }}
           />
         </div>

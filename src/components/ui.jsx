@@ -17,7 +17,7 @@ export function GeometricAccent({ position = 'tr', size = 140 }) {
         style={{
           width: size * 0.22,
           height: size,
-          background: '#7bd5f5',
+          background: '#fda4af',
           top: isTR ? -20 : -10,
           [isTR ? 'right' : 'left']: 8,
           opacity: 0.95,
@@ -27,7 +27,7 @@ export function GeometricAccent({ position = 'tr', size = 140 }) {
         style={{
           width: size * 0.18,
           height: size,
-          background: '#4db8e8',
+          background: '#fb7185',
           top: isTR ? -10 : 0,
           [isTR ? 'right' : 'left']: size * 0.28,
           opacity: 0.9,
@@ -37,7 +37,7 @@ export function GeometricAccent({ position = 'tr', size = 140 }) {
         style={{
           width: size * 0.14,
           height: size,
-          background: '#2f8fd4',
+          background: '#e11d48',
           top: isTR ? 0 : 10,
           [isTR ? 'right' : 'left']: size * 0.48,
           opacity: 0.85,
@@ -47,7 +47,7 @@ export function GeometricAccent({ position = 'tr', size = 140 }) {
         style={{
           width: size * 0.1,
           height: size,
-          background: '#1e4a6e',
+          background: '#9f1239',
           top: isTR ? 12 : 20,
           [isTR ? 'right' : 'left']: size * 0.64,
           opacity: 0.8,
@@ -69,10 +69,10 @@ export function BrandLogo({ size = 48, withName = false, light = false }) {
           height: size,
           borderRadius: '50%',
           objectFit: 'cover',
-          background: '#EBF5FB',
+          background: '#FFF1F2',
           boxShadow: light
-            ? '0 4px 14px rgba(15, 36, 56, 0.22)'
-            : '0 6px 16px rgba(47, 143, 212, 0.22)',
+            ? '0 4px 14px rgba(36, 11, 67, 0.22)'
+            : '0 6px 16px rgba(225, 29, 72, 0.2)',
         }}
       />
       {withName && <span style={{ fontSize: size * 0.42 }}>KudiCart</span>}
@@ -99,12 +99,13 @@ export function Toast({ message, onDone }) {
   return <div className="toast">{message}</div>
 }
 
-export function PhoneShell({ children, nav }) {
+export function PhoneShell({ children, nav, overlay, className = '' }) {
   return (
-    <div className="phone-stage paper-bg">
-      <div className="phone-shell paper-bg">
+    <div className={`phone-stage paper-bg ${className ? `${className}-stage` : ''}`.trim()}>
+      <div className={`phone-shell paper-bg ${className}`.trim()}>
         <div className="phone-scroll">{children}</div>
         {nav}
+        {overlay}
       </div>
     </div>
   )

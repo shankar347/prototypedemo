@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   Home,
   Search,
@@ -19,6 +20,20 @@ import {
   X,
   Heart,
   Filter,
+  Grid2X2,
+  Camera,
+  Mic,
+  Zap,
+  ChevronDown,
+  ArrowRight,
+  Sparkles,
+  Clock3,
+  LocateFixed,
+  Shirt,
+  Footprints,
+  Gem,
+  CheckCircle2,
+  ShoppingBag,
 } from 'lucide-react'
 import { PhoneShell, BottomNav, GeometricAccent, Stars, BrandLogo } from '../components/ui'
 import { useApp } from '../context/AppContext'
@@ -31,13 +46,248 @@ import {
   COUPONS,
   formatINR,
 } from '../data/mockData'
+import './userApp.css'
 
 const NAV = [
   { id: 'home', label: 'Home', icon: Home },
+  { id: 'categories', label: 'Categories', icon: Grid2X2 },
   { id: 'search', label: 'Search', icon: Search },
+  { id: 'wishlist', label: 'Wishlist', icon: Heart },
   { id: 'cart', label: 'Cart', icon: ShoppingCart },
   { id: 'profile', label: 'Profile', icon: User },
 ]
+
+const FASHION_CATEGORIES = [
+  { id: 'men', name: 'Men', image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=500&h=500&fit=crop' },
+  { id: 'women', name: 'Women', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&h=500&fit=crop' },
+  { id: 'footwear', name: 'Sneakers', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop' },
+  { id: 'fragrances', name: 'Fragrances', image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop' },
+  { id: 'accessories', name: 'Handbags', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&h=500&fit=crop' },
+  { id: 'oversized', name: 'Oversized', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop' },
+  { id: 'streetwear', name: 'Streetwear', image: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=500&h=500&fit=crop' },
+  { id: 'ethnic', name: 'Ethnic', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500&h=500&fit=crop' },
+  { id: 'sports', name: 'Activewear', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=500&fit=crop' },
+  { id: 'kids', name: 'Kids', image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=500&h=500&fit=crop' },
+  { id: 'luxury', name: 'Luxury', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&h=500&fit=crop' },
+]
+
+const HERO_BANNERS = [
+  {
+    title: 'Wear it tonight.',
+    copy: 'Latest drops, styled and delivered before your plans begin.',
+    cta: 'Explore collections',
+    category: 'women',
+    image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1000&h=720&fit=crop',
+  },
+  {
+    title: 'Streetwear, right now.',
+    copy: 'Fresh oversized fits and sneakers delivered while the trend is still hot.',
+    cta: 'Shop new drops',
+    category: 'streetwear',
+    image: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=1000&h=720&fit=crop',
+  },
+  {
+    title: 'The finishing touch.',
+    copy: 'Statement bags, scents and details that transform tonight’s look.',
+    cta: 'Discover accessories',
+    category: 'accessories',
+    image: 'https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=1000&h=720&fit=crop',
+  },
+  {
+    title: 'Step out sooner.',
+    copy: 'Fresh pairs from nearby stores, at your door in under an hour.',
+    cta: 'Shop sneakers',
+    category: 'footwear',
+    image: 'https://images.unsplash.com/photo-1554139844-af2fc8ad3a3a?w=1000&h=720&fit=crop',
+  },
+]
+
+const CAMPAIGN_BANNERS = [
+  {
+    title: 'The new drop',
+    copy: 'Trending streetwear',
+    offer: 'MIN. 55% OFF',
+    category: 'streetwear',
+    image: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'Sole searching',
+    copy: 'Sneakers & statement shoes',
+    offer: 'UP TO 60% OFF',
+    category: 'footwear',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'Carry your mood',
+    copy: 'Bags for every plan',
+    offer: 'FROM ₹799',
+    category: 'accessories',
+    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'A scent of you',
+    copy: 'Signature fragrances',
+    offer: 'UP TO 45% OFF',
+    category: 'fragrances',
+    image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'Modern heritage',
+    copy: 'Ethnic fits, reimagined',
+    offer: 'UP TO 50% OFF',
+    category: 'ethnic',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'After-dark edit',
+    copy: 'Premium evening layers',
+    offer: 'FROM ₹1,499',
+    category: 'luxury',
+    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=900&h=520&fit=crop',
+  },
+]
+
+const TIMED_DEAL_BANNERS = [
+  {
+    title: 'Midnight scent sale',
+    copy: 'Luxury fragrances',
+    offer: 'UP TO 45% OFF',
+    category: 'fragrances',
+    image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'The bag event',
+    copy: 'Carry the latest',
+    offer: 'FROM ₹799',
+    category: 'accessories',
+    image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'Occasion ready',
+    copy: 'Modern ethnic edit',
+    offer: 'MIN. 40% OFF',
+    category: 'ethnic',
+    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=900&h=520&fit=crop',
+  },
+  {
+    title: 'After-hours heels',
+    copy: 'Party pairs delivered fast',
+    offer: 'UP TO 50% OFF',
+    category: 'footwear',
+    image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=900&h=520&fit=crop',
+  },
+]
+
+const POPUP_OFFERS = [
+  {
+    label: 'APP-ONLY FLASH SALE',
+    title: 'Tonight’s looks,\nprices gone soon.',
+    copy: 'Up to 60% off selected new-season fashion.',
+    category: 'streetwear',
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=760&h=520&fit=crop',
+  },
+  {
+    label: 'SNEAKER HOUR',
+    title: 'Fresh pairs.\nFast prices.',
+    copy: 'Extra markdowns on sneakers available near you.',
+    category: 'footwear',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=760&h=520&fit=crop',
+  },
+  {
+    label: 'ACCESSORY DROP',
+    title: 'Finish the look\nfor less.',
+    copy: 'Limited prices on bags, watches and fragrances.',
+    category: 'accessories',
+    image: 'https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=760&h=520&fit=crop',
+  },
+]
+
+const CATEGORY_COLLECTIONS = [
+  {
+    title: 'Trending fashion edits',
+    items: [
+      { name: 'Shirts', query: 'shirt', category: 'men', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=260&h=260&fit=crop' },
+      { name: 'Dresses', query: 'dress', category: 'women', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=260&h=260&fit=crop' },
+      { name: 'Oversized', query: '', category: 'oversized', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=260&h=260&fit=crop' },
+      { name: 'Streetwear', query: '', category: 'streetwear', image: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=260&h=260&fit=crop' },
+      { name: 'Ethnic wear', query: '', category: 'ethnic', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=260&h=260&fit=crop' },
+      { name: 'Activewear', query: '', category: 'sports', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=260&h=260&fit=crop' },
+    ],
+  },
+  {
+    title: 'Footwear style ups',
+    items: [
+      { name: 'Sneakers', query: 'sneakers', category: 'footwear', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=260&h=260&fit=crop' },
+      { name: 'Heels & flats', query: 'heels', category: 'footwear', image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=260&h=260&fit=crop' },
+      { name: 'Sandals', query: '', category: 'footwear', image: 'https://images.unsplash.com/photo-1603487742131-4160ec999306?w=260&h=260&fit=crop' },
+      { name: 'Sports shoes', query: 'runner', category: 'footwear', image: 'https://images.unsplash.com/photo-1554139844-af2fc8ad3a3a?w=260&h=260&fit=crop' },
+      { name: 'Court shoes', query: 'court', category: 'footwear', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=260&h=260&fit=crop' },
+      { name: 'Party heels', query: 'midnight', category: 'footwear', image: 'https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?w=260&h=260&fit=crop' },
+    ],
+  },
+  {
+    title: 'Bags for all occasions',
+    items: [
+      { name: 'Slings', query: 'crossbody', category: 'accessories', image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=260&h=260&fit=crop' },
+      { name: 'Totes', query: 'tote', category: 'accessories', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=260&h=260&fit=crop' },
+      { name: 'Party bags', query: 'handbag', category: 'accessories', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=260&h=260&fit=crop' },
+      { name: 'Shoulder bags', query: 'shoulder', category: 'accessories', image: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=260&h=260&fit=crop' },
+      { name: 'Backpacks', query: '', category: 'accessories', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=260&h=260&fit=crop' },
+      { name: 'Luxury bags', query: 'atelier', category: 'accessories', image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=260&h=260&fit=crop' },
+    ],
+  },
+  {
+    title: 'Jewellery & finishing touches',
+    items: [
+      { name: 'Necklaces', query: 'gold', category: 'accessories', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=260&h=260&fit=crop' },
+      { name: 'Watches', query: 'watch', category: 'accessories', image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=260&h=260&fit=crop' },
+      { name: 'Rings', query: '', category: 'luxury', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=260&h=260&fit=crop' },
+      { name: 'Fragrances', query: 'parfum', category: 'fragrances', image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=260&h=260&fit=crop' },
+      { name: 'Skin mists', query: 'mist', category: 'fragrances', image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=260&h=260&fit=crop' },
+      { name: 'Premium edit', query: '', category: 'luxury', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=260&h=260&fit=crop' },
+    ],
+  },
+]
+
+const FASHION_OFFERS = [
+  { name: 'Ethnic Wear', offer: '50–80% OFF', category: 'ethnic', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=420&h=520&fit=crop' },
+  { name: 'Casual Wear', offer: '40–80% OFF', category: 'men', image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=420&h=520&fit=crop' },
+  { name: "Men's Activewear", offer: '30–70% OFF', category: 'sports', image: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=420&h=520&fit=crop' },
+  { name: "Women's Activewear", offer: '30–70% OFF', category: 'sports', image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=420&h=520&fit=crop' },
+  { name: 'Western Wear', offer: '40–80% OFF', category: 'women', image: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=420&h=520&fit=crop' },
+  { name: 'Sneakers', offer: '30–60% OFF', category: 'footwear', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=420&h=520&fit=crop' },
+]
+
+const GENDER_EDITS = {
+  him: [
+    { name: 'Shirts', price: 349, category: 'men', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=360&h=420&fit=crop' },
+    { name: 'T-shirts', price: 299, category: 'oversized', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=360&h=420&fit=crop' },
+    { name: 'Bottoms', price: 499, category: 'men', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=360&h=420&fit=crop' },
+    { name: 'Footwear', price: 249, category: 'footwear', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=360&h=420&fit=crop' },
+    { name: 'Backpacks', price: 249, category: 'accessories', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=360&h=420&fit=crop' },
+  ],
+  her: [
+    { name: 'Dresses', price: 399, category: 'women', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=360&h=420&fit=crop' },
+    { name: 'Topwear', price: 249, category: 'women', image: 'https://images.unsplash.com/photo-1554568218-0f1715e72254?w=360&h=420&fit=crop' },
+    { name: 'Ethnic', price: 499, category: 'ethnic', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=360&h=420&fit=crop' },
+    { name: 'Handbags', price: 249, category: 'accessories', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=360&h=420&fit=crop' },
+    { name: 'Jewellery', price: 79, category: 'luxury', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=360&h=420&fit=crop' },
+  ],
+}
+
+const PAGE_MOTION = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -6 },
+  transition: { duration: 0.22, ease: 'easeOut' },
+}
+
+const formatCountdown = (seconds) => {
+  const safeSeconds = Math.max(0, seconds)
+  const minutes = Math.floor(safeSeconds / 60)
+  const remainder = safeSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`
+}
 
 export default function UserApp() {
   const ctx = useApp()
@@ -48,7 +298,7 @@ export default function UserApp() {
   const go = (next, push = true) => {
     if (push && screen !== next) setStack((s) => [...s, screen])
     setScreen(next)
-    if (['home', 'search', 'cart', 'profile'].includes(next)) setTab(next)
+    if (['home', 'categories', 'search', 'wishlist', 'cart', 'profile'].includes(next)) setTab(next)
   }
 
   const back = () => {
@@ -56,7 +306,7 @@ export default function UserApp() {
       const prev = s[s.length - 1]
       if (prev) {
         setScreen(prev)
-        if (['home', 'search', 'cart', 'profile'].includes(prev)) setTab(prev)
+        if (['home', 'categories', 'search', 'wishlist', 'cart', 'profile'].includes(prev)) setTab(prev)
         return s.slice(0, -1)
       }
       setScreen('home')
@@ -77,10 +327,12 @@ export default function UserApp() {
     }
   }, [ctx.user, screen])
 
-  const showNav = ctx.user && ['home', 'search', 'cart', 'profile'].includes(screen)
+  const showNav = ctx.user && ['home', 'categories', 'search', 'wishlist', 'cart', 'profile'].includes(screen)
 
   return (
     <PhoneShell
+      className="fashion-app"
+      overlay={ctx.toast ? <div className="toast">{ctx.toast}</div> : null}
       nav={
         showNav ? (
           <BottomNav
@@ -91,86 +343,90 @@ export default function UserApp() {
         ) : null
       }
     >
-      {screen === 'login' && <LoginScreen onSend={() => go('otp', false)} />}
-      {screen === 'otp' && (
-        <OtpScreen
-          onBack={() => setScreen('login')}
-          onVerify={(phone) => {
-            ctx.setUser({ name: 'Priya Sharma', phone, email: 'priya@mail.com' })
-            go('home', false)
-            setStack([])
-          }}
-        />
-      )}
-      {screen === 'home' && <HomeScreen go={go} />}
-      {screen === 'search' && <SearchScreen go={go} />}
-      {screen === 'cart' && <CartScreen go={go} />}
-      {screen === 'checkout' && <CheckoutScreen go={go} back={back} />}
-      {screen === 'profile' && <ProfileScreen go={go} />}
-      {screen === 'orders' && <OrdersScreen go={go} back={back} />}
-      {screen === 'orderDetail' && <OrderDetailScreen go={go} back={back} />}
-      {screen === 'addresses' && <AddressesScreen back={back} />}
-      {screen === 'product' && <ProductScreen go={go} back={back} />}
-      {screen === 'notifications' && <NotificationsScreen back={back} />}
-      {screen === 'settings' && <SettingsScreen back={back} />}
-      {screen === 'review' && <ReviewScreen back={back} />}
-      {screen === 'success' && (
-        <SuccessScreen
-          onDone={() => {
-            setStack([])
-            go('orders', false)
-          }}
-        />
-      )}
-      {ctx.toast && <div className="toast">{ctx.toast}</div>}
+      <AnimatePresence mode="wait">
+        <motion.div key={screen} {...PAGE_MOTION} className="fashion-page">
+          {screen === 'login' && <LoginScreen onSend={() => go('otp', false)} />}
+          {screen === 'otp' && (
+            <OtpScreen
+              onBack={() => setScreen('login')}
+              onVerify={(phone) => {
+                ctx.setUser({ name: 'Priya Sharma', phone, email: 'priya@mail.com' })
+                go('home', false)
+                setStack([])
+              }}
+            />
+          )}
+          {screen === 'home' && <HomeScreen go={go} />}
+          {screen === 'categories' && <CategoriesScreen go={go} />}
+          {screen === 'search' && <SearchScreen go={go} />}
+          {screen === 'wishlist' && <WishlistScreen go={go} />}
+          {screen === 'cart' && <CartScreen go={go} />}
+          {screen === 'checkout' && <CheckoutScreen go={go} back={back} />}
+          {screen === 'profile' && <ProfileScreen go={go} />}
+          {screen === 'orders' && <OrdersScreen go={go} back={back} />}
+          {screen === 'orderDetail' && <OrderDetailScreen go={go} back={back} />}
+          {screen === 'addresses' && <AddressesScreen back={back} />}
+          {screen === 'product' && <ProductScreen go={go} back={back} />}
+          {screen === 'notifications' && <NotificationsScreen back={back} />}
+          {screen === 'settings' && <SettingsScreen back={back} />}
+          {screen === 'review' && <ReviewScreen back={back} />}
+          {screen === 'success' && (
+            <SuccessScreen
+              onDone={() => {
+                setStack([])
+                go('orders', false)
+              }}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </PhoneShell>
   )
 }
 
-function AppHeader({ title, onBack, right, compact }) {
+function AppHeader({ title, onBack, right }) {
   return (
-    <header
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 20,
-        background: 'linear-gradient(135deg, #7bd5f5 0%, #4db8e8 45%, #1e4a6e 160%)',
-        color: 'white',
-        padding: compact ? '14px 16px' : '18px 16px 20px',
-        overflow: 'hidden',
-      }}
-    >
-      <GeometricAccent position="tr" size={110} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative', zIndex: 1 }}>
-        {onBack ? (
-          <button type="button" onClick={onBack} aria-label="Back" style={{ color: 'white', display: 'grid', placeItems: 'center' }}>
-            <ArrowLeft size={22} />
-          </button>
-        ) : (
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img
-              src="/logo.png"
-              alt="KudiCart"
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                background: '#EBF5FB',
-                boxShadow: '0 4px 12px rgba(15, 36, 56, 0.2)',
-              }}
-            />
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19, letterSpacing: '-0.02em' }}>
-              KudiCart
-            </span>
-          </Link>
-        )}
-        {title && onBack && (
-          <h1 style={{ flex: 1, fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700 }}>{title}</h1>
-        )}
-        {!onBack && <div style={{ flex: 1 }} />}
-        {right}
+    <header className="fashion-subheader">
+      {onBack ? (
+        <button type="button" onClick={onBack} aria-label="Back">
+          <ArrowLeft size={20} />
+        </button>
+      ) : (
+        <img src="/logo.png" alt="KudiCart" style={{ width: 38, height: 38, borderRadius: 13, objectFit: 'cover' }} />
+      )}
+      <h1>{title || 'KudiCart'}</h1>
+      {right}
+    </header>
+  )
+}
+
+function DeliveryHeader({ go }) {
+  return (
+    <header className="fashion-header">
+      <div className="fashion-header-row">
+        <button type="button" className="fashion-location" onClick={() => go('addresses')}>
+          <span className="fashion-location-icon">
+            <MapPin size={19} />
+          </span>
+          <span className="fashion-location-copy">
+            <small>Delivering to</small>
+            <strong>Anna Nagar, Chennai <ChevronDown size={14} /></strong>
+          </span>
+        </button>
+        <div className="fashion-eta">
+          <Zap size={17} fill="currentColor" />
+          <span>
+            <small>Delivered in</small>
+            <strong>25 mins</strong>
+          </span>
+        </div>
       </div>
+      <button type="button" className="fashion-search" onClick={() => go('search')}>
+        <Search size={19} />
+        <span>Search T-Shirts, Sneakers, Hoodies...</span>
+        <Mic size={18} />
+        <Camera size={18} />
+      </button>
     </header>
   )
 }
@@ -179,7 +435,7 @@ function LoginScreen({ onSend }) {
   const [phone, setPhone] = useState('')
   return (
     <div
-      className="paper-bg"
+      className="fashion-auth"
       style={{
         minHeight: '100%',
         height: '100%',
@@ -197,8 +453,9 @@ function LoginScreen({ onSend }) {
         <div style={{ margin: '28px 0 12px' }}>
           <BrandLogo size={64} withName />
         </div>
+        <div className="fashion-auth-promise"><Zap size={13} fill="currentColor" /> Premium fashion in 30–60 mins</div>
         <p style={{ color: 'var(--muted)', marginBottom: 36, lineHeight: 1.5 }}>
-          Enter your mobile number to browse & order apparel with OTP verification.
+          Your next outfit is closer than you think. Sign in to shop styles available near you.
         </p>
         <div className="field" style={{ marginBottom: 20 }}>
           <label>Mobile Number</label>
@@ -212,10 +469,10 @@ function LoginScreen({ onSend }) {
         </div>
         <button
           type="button"
-          className="btn btn-primary btn-block"
+          className="fashion-primary"
           disabled={phone.replace(/\D/g, '').length < 10}
           onClick={onSend}
-          style={{ opacity: phone.replace(/\D/g, '').length < 10 ? 0.5 : 1 }}
+          style={{ opacity: phone.replace(/\D/g, '').length < 10 ? 0.5 : 1, width: '100%', minHeight: 52 }}
         >
           Get OTP
         </button>
@@ -232,7 +489,7 @@ function OtpScreen({ onBack, onVerify }) {
   const code = otp.join('')
   return (
     <div
-      className="paper-bg fade-in"
+      className="fashion-auth fade-in"
       style={{
         minHeight: '100%',
         height: '100%',
@@ -281,9 +538,9 @@ function OtpScreen({ onBack, onVerify }) {
         </div>
         <button
           type="button"
-          className="btn btn-primary btn-block"
+          className="fashion-primary"
           disabled={code.length < 4}
-          style={{ opacity: code.length < 4 ? 0.5 : 1 }}
+          style={{ opacity: code.length < 4 ? 0.5 : 1, width: '100%', minHeight: 52 }}
           onClick={() => onVerify('+91 98765 43210')}
         >
           Verify & Continue
@@ -297,6 +554,450 @@ function OtpScreen({ onBack, onVerify }) {
 }
 
 function HomeScreen({ go }) {
+  const ctx = useApp()
+  const [heroIndex, setHeroIndex] = useState(0)
+  const [campaignIndex, setCampaignIndex] = useState(0)
+  const [timedDealIndex, setTimedDealIndex] = useState(0)
+  const [saleSeconds, setSaleSeconds] = useState(14 * 60 + 32)
+  const [showLaunchOffer, setShowLaunchOffer] = useState(false)
+  const [popupOfferIndex, setPopupOfferIndex] = useState(0)
+  const fashionProducts = ctx.products.filter((product) =>
+    ['men', 'women', 'kids', 'accessories', 'footwear', 'fragrances', 'sports', 'oversized', 'streetwear', 'ethnic', 'luxury'].includes(product.category),
+  )
+  const byIds = (...ids) => ids.map((id) => fashionProducts.find((item) => item.id === id)).filter(Boolean)
+  const openProduct = (product) => {
+    ctx.trackRecentlyViewed(product)
+    sessionStorage.setItem('pid', product.id)
+    go('product')
+  }
+  const quickAdd = (product) => {
+    ctx.addToCart(product, product.sizes?.[0] || 'Standard', product.colors?.[0] || 'Standard')
+  }
+  const browseCategory = (category, query = '') => {
+    sessionStorage.setItem('searchCat', category)
+    if (query) sessionStorage.setItem('searchQuery', query)
+    go('search')
+  }
+  const viewed = ctx.recentlyViewed.length ? ctx.recentlyViewed : byIds('p3', 'p6', 'p9')
+  const continueShopping = ctx.cart.length
+    ? ctx.cart.map((item) => item.product)
+    : byIds('p1', 'p5', 'p10')
+  const activeHero = HERO_BANNERS[heroIndex]
+  const activePopupOffer = POPUP_OFFERS[popupOfferIndex]
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroIndex((current) => (current + 1) % HERO_BANNERS.length)
+    }, 4500)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCampaignIndex((current) => (current + 1) % CAMPAIGN_BANNERS.length)
+    }, 3800)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setTimedDealIndex((current) => (current + 1) % TIMED_DEAL_BANNERS.length)
+    }, 4200)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSaleSeconds((current) => (current > 0 ? current - 1 : 15 * 60))
+    }, 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const nextOffer = Number(sessionStorage.getItem('fashionPopupRotation') || 0) % POPUP_OFFERS.length
+    setPopupOfferIndex(nextOffer)
+    sessionStorage.setItem('fashionPopupRotation', String((nextOffer + 1) % POPUP_OFFERS.length))
+    const timer = window.setTimeout(() => {
+      setShowLaunchOffer(true)
+    }, 700)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  return (
+    <div className="fashion-page">
+      <DeliveryHeader go={go} />
+      <main className="fashion-main">
+        <motion.section
+          className="fashion-hero"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.45 }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              className="fashion-hero-slide"
+              key={activeHero.title}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.45 }}
+            >
+              <img src={activeHero.image} alt="" />
+              <div className="fashion-hero-content">
+                <h1>{activeHero.title}</h1>
+                <p>{activeHero.copy}</p>
+                <motion.button
+                  type="button"
+                  className="fashion-primary"
+                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ y: -2 }}
+                  onClick={() => browseCategory(activeHero.category)}
+                >
+                  {activeHero.cta} <ArrowRight size={16} />
+                </motion.button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          <div className="fashion-hero-dots" aria-label="Featured collections">
+            {HERO_BANNERS.map((banner, index) => (
+              <button
+                type="button"
+                key={banner.title}
+                className={index === heroIndex ? 'active' : ''}
+                onClick={() => setHeroIndex(index)}
+                aria-label={`Show ${banner.title}`}
+              />
+            ))}
+          </div>
+        </motion.section>
+
+        <FashionSection title="Biggest fashion offers" subtitle="Top edits at prices worth rushing for">
+          <div className="fashion-offer-rail">
+            {FASHION_OFFERS.map((offer) => (
+              <motion.button
+                type="button"
+                className="fashion-offer-card"
+                key={offer.name}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => browseCategory(offer.category)}
+              >
+                <img src={offer.image} alt={offer.name} loading="lazy" />
+                <span>{offer.name}</span>
+                <strong>{offer.offer}</strong>
+                <small>Shop now</small>
+              </motion.button>
+            ))}
+          </div>
+        </FashionSection>
+
+        <FashionSection title="Fresh campaigns" subtitle="New edits rolling in all day">
+          <div className="fashion-campaign-slider">
+            <div
+              className="fashion-campaign-track"
+              style={{ transform: `translateX(-${campaignIndex * 100}%)` }}
+            >
+              {CAMPAIGN_BANNERS.map((banner) => (
+                <button
+                  type="button"
+                  className="fashion-campaign-slide"
+                  key={banner.title}
+                  onClick={() => browseCategory(banner.category)}
+                >
+                  <img src={banner.image} alt="" loading="lazy" />
+                  <span>
+                    <small>{banner.copy}</small>
+                    <strong>{banner.title}</strong>
+                    <b>{banner.offer}</b>
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="fashion-campaign-dots">
+              {CAMPAIGN_BANNERS.map((banner, index) => (
+                <button
+                  type="button"
+                  key={banner.title}
+                  className={index === campaignIndex ? 'active' : ''}
+                  onClick={() => setCampaignIndex(index)}
+                  aria-label={`Show ${banner.title}`}
+                />
+              ))}
+            </div>
+          </div>
+        </FashionSection>
+
+        <FashionSection title="Shop your mood" subtitle="Curated edits, delivered today" action="See all" onAction={() => go('categories')}>
+          <div className="fashion-category-grid">
+            {FASHION_CATEGORIES.slice(0, 8).map((category, index) => (
+              <motion.button
+                key={category.id}
+                type="button"
+                className="fashion-category-card"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.04 }}
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ y: -4 }}
+                onClick={() => browseCategory(category.id)}
+              >
+                <img src={category.image} alt="" loading="lazy" />
+                <span>{category.name}</span>
+              </motion.button>
+            ))}
+          </div>
+        </FashionSection>
+
+        {CATEGORY_COLLECTIONS.map((collection) => (
+          <FashionSection key={collection.title} title={collection.title} subtitle="Tap a style to shop the edit">
+            <div className="fashion-mini-category-rail">
+              {collection.items.map((item) => (
+                <motion.button
+                  type="button"
+                  key={item.name}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => browseCategory(item.category, item.query)}
+                >
+                  <span><img src={item.image} alt="" loading="lazy" /></span>
+                  <strong>{item.name}</strong>
+                </motion.button>
+              ))}
+            </div>
+          </FashionSection>
+        ))}
+
+        {Object.entries(GENDER_EDITS).map(([audience, edits]) => (
+          <FashionSection
+            key={audience}
+            title={audience === 'him' ? 'Men' : 'Women'}
+            subtitle={`${audience === 'him' ? "Men's" : "Women's"} fashion, ready nearby`}
+            action="See all"
+            onAction={() => browseCategory(audience === 'him' ? 'men' : 'women')}
+          >
+            <div className="fashion-edit-rail">
+              {edits.map((edit) => (
+                <motion.button
+                  type="button"
+                  className="fashion-edit-card"
+                  key={edit.name}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => browseCategory(edit.category)}
+                >
+                  <span className="fashion-edit-image"><img src={edit.image} alt="" loading="lazy" /></span>
+                  <strong>{edit.name}</strong>
+                  <small>FROM <b>{formatINR(edit.price)}</b></small>
+                </motion.button>
+              ))}
+            </div>
+          </FashionSection>
+        ))}
+
+        <ProductRail title="Trending now" subtitle="What Chennai is wearing today" products={byIds('p9', 'p11', 'p12', 'p10')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="Sneaker station" subtitle="Fresh pairs, delivered before you step out" products={byIds('p6', 'p11', 'p19', 'p20')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <FashionSection title="Deals on the clock" subtitle="New image, new offer — every few seconds">
+          <div className="fashion-campaign-slider fashion-timed-slider">
+            <div
+              className="fashion-campaign-track"
+              style={{ transform: `translateX(-${timedDealIndex * 100}%)` }}
+            >
+              {TIMED_DEAL_BANNERS.map((banner) => (
+                <button
+                  type="button"
+                  className="fashion-campaign-slide fashion-timed-slide"
+                  key={banner.title}
+                  onClick={() => browseCategory(banner.category)}
+                >
+                  <img src={banner.image} alt="" loading="lazy" />
+                  <span>
+                    <small>{banner.copy}</small>
+                    <strong>{banner.title}</strong>
+                    <b>{banner.offer}</b>
+                    <em><Clock3 size={12} /> Ends in {formatCountdown(saleSeconds)}</em>
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="fashion-campaign-dots">
+              {TIMED_DEAL_BANNERS.map((banner, index) => (
+                <button
+                  type="button"
+                  key={banner.title}
+                  className={index === timedDealIndex ? 'active' : ''}
+                  onClick={() => setTimedDealIndex(index)}
+                  aria-label={`Show ${banner.title}`}
+                />
+              ))}
+            </div>
+          </div>
+        </FashionSection>
+        <ProductRail title="Scents in sixty" subtitle="Signature fragrances from stores nearby" products={byIds('p17', 'p21', 'p23')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="The handbag edit" subtitle="Carry the look, delivered today" products={byIds('p8', 'p18', 'p22', 'p24')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="New arrivals" subtitle="Fresh drops, just landed" products={byIds('p12', 'p13', 'p15', 'p14')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="Best sellers" subtitle="Most loved, rarely in stock" products={fashionProducts.filter((item) => item.bestseller).slice(0, 5)} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="Flash deals" subtitle={`Sale refreshes in ${formatCountdown(saleSeconds)}`} products={byIds('p4', 'p9', 'p13', 'p8')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} badge="Limited time" />
+        <ProductRail title="Under ₹999" subtitle="Big style, easy price" products={fashionProducts.filter((item) => item.price < 1000).slice(0, 5)} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+
+        <FashionSection title="Premium brands" subtitle="Elevated labels, express delivered" action="View edit" onAction={() => go('search')}>
+          <div className="fashion-brand-grid">
+            {byIds('p14', 'p16', 'p2', 'p12').map((product) => (
+              <motion.button
+                key={product.id}
+                type="button"
+                className="fashion-brand-card"
+                whileTap={{ scale: 0.97 }}
+                onClick={() => openProduct(product)}
+              >
+                <img src={product.image} alt="" loading="lazy" />
+                <strong>{product.brand}</strong>
+              </motion.button>
+            ))}
+          </div>
+        </FashionSection>
+
+        <ProductRail title="Recently viewed" subtitle="Pick up where you left off" products={viewed} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="Continue shopping" subtitle="Your edit is waiting" products={continueShopping} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+        <ProductRail title="Recommended for you" subtitle="Personal picks, available nearby" products={byIds('p10', 'p11', 'p15', 'p5')} ctx={ctx} onOpen={openProduct} onQuickAdd={quickAdd} />
+
+        <footer className="fashion-footer">
+          <strong>KudiCart</strong>
+          Premium fashion from stores near you, delivered in 30–60 minutes.
+          <br />Authentic products · Easy returns · Live delivery tracking
+        </footer>
+      </main>
+      <AnimatePresence>
+        {showLaunchOffer && (
+          <motion.div
+            className="fashion-offer-popup-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="fashion-offer-popup"
+              initial={{ opacity: 0, y: 28, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 23 }}
+            >
+              <button type="button" className="fashion-popup-close" onClick={() => setShowLaunchOffer(false)} aria-label="Close offer">
+                <X size={18} />
+              </button>
+              <div className="fashion-popup-image">
+                <img src={activePopupOffer.image} alt="" />
+                <span>JUST DROPPED</span>
+              </div>
+              <div className="fashion-popup-copy">
+                <small>{activePopupOffer.label}</small>
+                <h2>
+                  {activePopupOffer.title.split('\n').map((line, index) => (
+                    <span key={line}>{line}{index === 0 && <br />}</span>
+                  ))}
+                </h2>
+                <p>{activePopupOffer.copy}</p>
+                <div className="fashion-popup-timer">
+                  <Clock3 size={17} />
+                  <span>Offer ends in</span>
+                  <strong>{formatCountdown(saleSeconds)}</strong>
+                </div>
+                <button
+                  type="button"
+                  className="fashion-primary"
+                  onClick={() => {
+                    setShowLaunchOffer(false)
+                    browseCategory(activePopupOffer.category)
+                  }}
+                >
+                  Shop limited-time sale <ArrowRight size={16} />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function FashionSection({ title, subtitle, action, onAction, children }) {
+  return (
+    <section className="fashion-section">
+      <div className="fashion-section-head">
+        <div>
+          <h2>{title}</h2>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+        {action && <button type="button" onClick={onAction}>{action}</button>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function ProductRail({ title, subtitle, products, ctx, onOpen, onQuickAdd, badge }) {
+  if (!products?.length) return null
+  return (
+    <FashionSection title={title} subtitle={subtitle} action="See all">
+      <div className="fashion-rail">
+        {products.map((product, index) => (
+          <FashionProductCard
+            key={`${title}-${product.id}`}
+            product={product}
+            ctx={ctx}
+            index={index}
+            onOpen={() => onOpen(product)}
+            onQuickAdd={() => onQuickAdd(product)}
+            badge={badge}
+          />
+        ))}
+      </div>
+    </FashionSection>
+  )
+}
+
+function FashionProductCard({ product, ctx, onOpen, onQuickAdd, index = 0, badge }) {
+  const wished = ctx.wishlist.some((item) => item.id === product.id)
+  const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100)
+  const deliveryMins = 22 + ((index + product.id.length) % 4) * 3
+
+  return (
+    <motion.article
+      className="fashion-product"
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-30px' }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.28, delay: index * 0.035 }}
+    >
+      <div className="fashion-product-image" onClick={onOpen} role="button" tabIndex={0}>
+        <img src={product.image} alt={product.title} loading="lazy" />
+        <span className="fashion-delivery-chip"><Zap size={11} fill="currentColor" /> {deliveryMins} mins</span>
+        {badge && <span className="fashion-kicker" style={{ position: 'absolute', top: 10, left: 10, zIndex: 2 }}>{badge}</span>}
+      </div>
+      <button
+        type="button"
+        className="fashion-wishlist"
+        onClick={() => ctx.toggleWishlist(product)}
+        aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+      >
+        <Heart size={17} fill={wished ? '#e11d48' : 'none'} color={wished ? '#e11d48' : 'currentColor'} />
+      </button>
+      <div className="fashion-product-copy">
+        <div className="fashion-product-brand">{product.brand}</div>
+        <div className="fashion-product-name" onClick={onOpen}>{product.title}</div>
+        <div className="fashion-product-rating"><Star size={11} fill="#111114" /> {product.rating} ({product.reviews})</div>
+        <div className="fashion-price-row">
+          <strong>{formatINR(product.price)}</strong>
+          <del>{formatINR(product.mrp)}</del>
+          <span>{discount}% off</span>
+        </div>
+        <motion.button type="button" className="fashion-quick-add" whileTap={{ scale: 0.96 }} onClick={onQuickAdd}>
+          Quick add
+        </motion.button>
+      </div>
+    </motion.article>
+  )
+}
+
+function LegacyHomeScreen({ go }) {
   const ctx = useApp()
   const [banner, setBanner] = useState(0)
   const bestsellers = ctx.products.filter((p) => p.bestseller)
@@ -654,7 +1355,230 @@ function ProductCard({ product, onClick }) {
   )
 }
 
+function CategoriesScreen({ go }) {
+  const browseCategory = (category, query = '') => {
+    sessionStorage.setItem('searchCat', category)
+    if (query) sessionStorage.setItem('searchQuery', query)
+    go('search')
+  }
+
+  return (
+    <div className="fashion-page">
+      <AppHeader title="Shop categories" />
+      <main className="fashion-main">
+        <div style={{ marginBottom: 18 }}>
+          <h2 style={{ fontFamily: 'Outfit', fontSize: 28, lineHeight: 1.05, marginBottom: 7 }}>Find your next look.</h2>
+          <p style={{ color: 'var(--fashion-muted)', fontSize: 12 }}>Every edit below can reach you in 30–60 minutes.</p>
+        </div>
+        <div className="fashion-category-grid">
+          {FASHION_CATEGORIES.map((category, index) => (
+            <motion.button
+              key={category.id}
+              type="button"
+              className="fashion-category-card"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.035 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => browseCategory(category.id)}
+            >
+              <img src={category.image} alt="" loading="lazy" />
+              <span>{category.name}</span>
+            </motion.button>
+          ))}
+        </div>
+        <div className="fashion-category-collections">
+          {CATEGORY_COLLECTIONS.map((collection) => (
+            <FashionSection key={collection.title} title={collection.title} subtitle="Explore every style in this edit">
+              <div className="fashion-mini-category-rail">
+                {collection.items.map((item) => (
+                  <motion.button
+                    type="button"
+                    key={item.name}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => browseCategory(item.category, item.query)}
+                  >
+                    <span><img src={item.image} alt="" loading="lazy" /></span>
+                    <strong>{item.name}</strong>
+                  </motion.button>
+                ))}
+              </div>
+            </FashionSection>
+          ))}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function WishlistScreen({ go }) {
+  const ctx = useApp()
+  const openProduct = (product) => {
+    ctx.trackRecentlyViewed(product)
+    sessionStorage.setItem('pid', product.id)
+    go('product')
+  }
+
+  return (
+    <div className="fashion-page">
+      <AppHeader title={`Wishlist${ctx.wishlist.length ? ` (${ctx.wishlist.length})` : ''}`} />
+      {ctx.wishlist.length === 0 ? (
+        <FashionEmpty
+          icon={Heart}
+          title="Your wishlist is waiting"
+          message="Save pieces you love and we’ll keep their express-delivery status ready."
+          action="Discover trending styles"
+          onAction={() => go('home')}
+        />
+      ) : (
+        <main className="fashion-main">
+          <div className="fashion-grid">
+            {ctx.wishlist.map((product, index) => (
+              <FashionProductCard
+                key={product.id}
+                product={product}
+                ctx={ctx}
+                index={index}
+                onOpen={() => openProduct(product)}
+                onQuickAdd={() => ctx.addToCart(product, product.sizes?.[0] || 'Standard', product.colors?.[0] || 'Standard')}
+              />
+            ))}
+          </div>
+        </main>
+      )}
+    </div>
+  )
+}
+
+function FashionEmpty({ icon: Icon, title, message, action, onAction }) {
+  return (
+    <div className="fashion-empty">
+      <motion.div className="fashion-empty-icon" initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+        <Icon size={34} />
+      </motion.div>
+      <h2>{title}</h2>
+      <p>{message}</p>
+      <button type="button" className="fashion-primary" onClick={onAction}>{action}</button>
+    </div>
+  )
+}
+
 function SearchScreen({ go }) {
+  const ctx = useApp()
+  const [q, setQ] = useState('')
+  const [cat, setCat] = useState('all')
+  const fashionCategoryIds = FASHION_CATEGORIES.map((item) => item.id)
+
+  useEffect(() => {
+    const initCat = sessionStorage.getItem('searchCat')
+    if (initCat) {
+      setCat(initCat)
+      sessionStorage.removeItem('searchCat')
+    }
+    const initBrand = sessionStorage.getItem('searchBrand')
+    if (initBrand) {
+      setQ(initBrand)
+      sessionStorage.removeItem('searchBrand')
+    }
+    const initQuery = sessionStorage.getItem('searchQuery')
+    if (initQuery) {
+      setQ(initQuery)
+      sessionStorage.removeItem('searchQuery')
+    }
+  }, [])
+
+  const list = ctx.products.filter((product) => {
+    if (!fashionCategoryIds.includes(product.category)) return false
+    const search = q.trim().toLowerCase()
+    const matchesQuery =
+      !search ||
+      product.title.toLowerCase().includes(search) ||
+      product.brand.toLowerCase().includes(search) ||
+      product.category.toLowerCase().includes(search)
+    return matchesQuery && (cat === 'all' || product.category === cat)
+  })
+
+  const openProduct = (product) => {
+    ctx.trackRecentlyViewed(product)
+    sessionStorage.setItem('pid', product.id)
+    go('product')
+  }
+
+  return (
+    <div className="fashion-page">
+      <AppHeader title="Search fashion" />
+      <main className="fashion-main">
+        <div style={{ position: 'relative', marginBottom: 14 }}>
+          <Search size={19} style={{ position: 'absolute', left: 15, top: 15, color: '#77727d' }} />
+          <input
+            value={q}
+            onChange={(event) => setQ(event.target.value)}
+            placeholder="T-Shirts, Sneakers, Hoodies..."
+            autoFocus
+            style={{
+              width: '100%',
+              height: 50,
+              padding: '0 76px 0 44px',
+              border: '1px solid var(--fashion-line)',
+              borderRadius: 16,
+              background: '#fff',
+              outline: 'none',
+              boxShadow: '0 8px 22px rgba(20,17,25,0.06)',
+            }}
+          />
+          <div style={{ position: 'absolute', right: 13, top: 15, display: 'flex', gap: 10, color: '#77727d' }}>
+            <Mic size={18} />
+            <Camera size={18} />
+          </div>
+        </div>
+        <div className="fashion-filter-row">
+          <button type="button" className={`fashion-filter ${cat === 'all' ? 'active' : ''}`} onClick={() => setCat('all')}>All fashion</button>
+          {FASHION_CATEGORIES.map((category) => (
+            <button
+              key={category.id}
+              type="button"
+              className={`fashion-filter ${cat === category.id ? 'active' : ''}`}
+              onClick={() => setCat(category.id)}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2px 0 12px' }}>
+          <strong style={{ fontSize: 12 }}>{list.length} styles available nearby</strong>
+          <span style={{ color: 'var(--fashion-accent)', fontSize: 10, fontWeight: 800 }}><Zap size={11} fill="currentColor" /> Express</span>
+        </div>
+        {list.length ? (
+          <div className="fashion-grid">
+            {list.map((product, index) => (
+              <FashionProductCard
+                key={product.id}
+                product={product}
+                ctx={ctx}
+                index={index}
+                onOpen={() => openProduct(product)}
+                onQuickAdd={() => ctx.addToCart(product, product.sizes?.[0] || 'Standard', product.colors?.[0] || 'Standard')}
+              />
+            ))}
+          </div>
+        ) : (
+          <FashionEmpty
+            icon={Search}
+            title="No styles found"
+            message="Try another search or explore today’s trending fashion."
+            action="Clear search"
+            onAction={() => {
+              setQ('')
+              setCat('all')
+            }}
+          />
+        )}
+      </main>
+    </div>
+  )
+}
+
+function LegacySearchScreen({ go }) {
   const ctx = useApp()
   const [q, setQ] = useState('')
   const [cat, setCat] = useState('all')
@@ -740,6 +1664,141 @@ function SearchScreen({ go }) {
 
 function ProductScreen({ go, back }) {
   const ctx = useApp()
+  const product = ctx.products.find((item) => item.id === sessionStorage.getItem('pid')) || ctx.products[0]
+  const [size, setSize] = useState(product.sizes?.[0] || 'Standard')
+  const [color, setColor] = useState(product.colors?.[0] || 'Standard')
+  const wished = ctx.wishlist.some((item) => item.id === product.id)
+  const similar = ctx.products
+    .filter((item) => item.category === product.category && item.id !== product.id)
+    .slice(0, 4)
+  const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100)
+
+  useEffect(() => {
+    ctx.trackRecentlyViewed(product)
+  }, [product.id])
+
+  const add = () => ctx.addToCart(product, size, color)
+
+  return (
+    <div className="fashion-page">
+      <AppHeader
+        title="Product details"
+        onBack={back}
+        right={
+          <button
+            type="button"
+            onClick={() => ctx.toggleWishlist(product)}
+            style={{ color: wished ? 'var(--fashion-accent)' : 'var(--fashion-black)' }}
+          >
+            <Heart size={20} fill={wished ? 'currentColor' : 'none'} />
+          </button>
+        }
+      />
+      <div className="fashion-detail-image">
+        <img src={product.image} alt={product.title} />
+        <span className="fashion-delivery-chip" style={{ bottom: 34 }}><Zap size={12} fill="currentColor" /> Arrives in 28 mins</span>
+      </div>
+      <div className="fashion-detail-body">
+        <div className="fashion-product-brand">{product.brand}</div>
+        <h1 style={{ margin: '5px 0 8px', fontFamily: 'Outfit', fontSize: 24, lineHeight: 1.15 }}>{product.title}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 800 }}>
+            <Star size={12} fill="#111114" /> {product.rating}
+          </span>
+          <span style={{ color: 'var(--fashion-muted)', fontSize: 10 }}>{product.reviews} verified reviews</span>
+          <span className="fashion-stock">Only 4 left</span>
+        </div>
+        <div className="fashion-price-row" style={{ marginBottom: 14 }}>
+          <strong style={{ fontSize: 22 }}>{formatINR(product.price)}</strong>
+          <del style={{ fontSize: 12 }}>{formatINR(product.mrp)}</del>
+          <span style={{ fontSize: 12 }}>{discount}% off</span>
+        </div>
+        <p style={{ color: 'var(--fashion-muted)', fontSize: 12, lineHeight: 1.6 }}>{product.description}</p>
+
+        <div className="fashion-speed-card">
+          <span className="fashion-speed-icon"><Zap size={20} fill="currentColor" /></span>
+          <span>
+            <small>Deliver to Anna Nagar</small>
+            <strong>Arrives in 28 mins · by 3:40 PM</strong>
+          </span>
+          <ChevronRight size={18} style={{ marginLeft: 'auto' }} />
+        </div>
+
+        {product.sizes?.length > 0 && (
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 9 }}>
+              <strong style={{ fontSize: 12 }}>Select size</strong>
+              <span style={{ color: 'var(--fashion-accent)', fontSize: 10, fontWeight: 800 }}>Size guide</span>
+            </div>
+            <div className="fashion-filter-row" style={{ paddingBottom: 0 }}>
+              {product.sizes.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={`fashion-filter ${size === item ? 'active' : ''}`}
+                  onClick={() => setSize(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {product.colors?.length > 1 && (
+          <div style={{ marginBottom: 20 }}>
+            <strong style={{ display: 'block', marginBottom: 9, fontSize: 12 }}>Colour</strong>
+            <div className="fashion-filter-row" style={{ paddingBottom: 0 }}>
+              {product.colors.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={`fashion-filter ${color === item ? 'active' : ''}`}
+                  onClick={() => setColor(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {similar.length > 0 && (
+          <ProductRail
+            title="Similar styles"
+            subtitle="Also available for express delivery"
+            products={similar}
+            ctx={ctx}
+            onOpen={(item) => {
+              ctx.trackRecentlyViewed(item)
+              sessionStorage.setItem('pid', item.id)
+              go('product')
+            }}
+            onQuickAdd={(item) => ctx.addToCart(item, item.sizes?.[0] || 'Standard', item.colors?.[0] || 'Standard')}
+          />
+        )}
+      </div>
+      <div className="fashion-actions">
+        <motion.button type="button" className="fashion-secondary" whileTap={{ scale: 0.97 }} onClick={add}>
+          Add to cart
+        </motion.button>
+        <motion.button
+          type="button"
+          className="fashion-primary"
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            add()
+            go('cart')
+          }}
+        >
+          Buy now · 28 mins
+        </motion.button>
+      </div>
+    </div>
+  )
+}
+
+function LegacyProductScreen({ go, back }) {
+  const ctx = useApp()
   const product = ctx.products.find((p) => p.id === sessionStorage.getItem('pid')) || ctx.products[0]
   const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0
   const hasColors = Array.isArray(product.colors) && product.colors.length > 0
@@ -817,6 +1876,98 @@ function Label({ children }) {
 }
 
 function CartScreen({ go }) {
+  const ctx = useApp()
+  const address = ctx.addresses.find((item) => item.default) || ctx.addresses[0]
+
+  return (
+    <div className="fashion-page">
+      <AppHeader title={`Your bag${ctx.cartCount ? ` (${ctx.cartCount})` : ''}`} />
+      {ctx.cart.length === 0 ? (
+        <FashionEmpty
+          icon={ShoppingBag}
+          title="Your bag needs a look"
+          message="Add a style now and we can have it at your door in under an hour."
+          action="Shop trending fashion"
+          onAction={() => go('home')}
+        />
+      ) : (
+        <main className="fashion-main" style={{ paddingBottom: 30 }}>
+          <div className="fashion-cart-eta">
+            <div className="fashion-cart-eta-top">
+              <span className="fashion-speed-icon"><Zap size={19} fill="currentColor" /></span>
+              <span>
+                <strong>Your order arrives by 4:15 PM</strong>
+                <span>Express delivery to Anna Nagar</span>
+              </span>
+            </div>
+            <div className="fashion-timeline">
+              {['Preparing', 'Packed', 'Out for delivery', 'Delivered'].map((step, index) => (
+                <span key={step} className={`fashion-timeline-step ${index === 0 ? 'active' : ''}`}>{step}</span>
+              ))}
+            </div>
+          </div>
+
+          {ctx.cart.map((item) => (
+            <motion.div key={item.key} className="fashion-cart-item" layout>
+              <img src={item.product.image} alt="" />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div className="fashion-product-brand">{item.product.brand}</div>
+                <div style={{ margin: '3px 0 5px', fontSize: 13, fontWeight: 800, lineHeight: 1.35 }}>{item.product.title}</div>
+                <div style={{ color: 'var(--fashion-muted)', fontSize: 10 }}>{item.size} · {item.color}</div>
+                <div style={{ margin: '8px 0', fontSize: 14, fontWeight: 800 }}>{formatINR(item.product.price)}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="qty">
+                    <button type="button" onClick={() => ctx.updateQty(item.key, -1)}>−</button>
+                    <span>{item.qty}</span>
+                    <button type="button" onClick={() => ctx.updateQty(item.key, 1)}>+</button>
+                  </div>
+                  <button type="button" onClick={() => ctx.removeFromCart(item.key)} style={{ color: '#8c8791' }}>
+                    <Trash2 size={17} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          <button
+            type="button"
+            className="fashion-checkout-block"
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left' }}
+            onClick={() => go('addresses')}
+          >
+            <MapPin size={19} color="var(--fashion-accent)" />
+            <span style={{ flex: 1 }}>
+              <strong style={{ display: 'block', fontSize: 12 }}>Delivering to {address?.label || 'Home'}</strong>
+              <span style={{ color: 'var(--fashion-muted)', fontSize: 10 }}>{address?.line}, {address?.city}</span>
+            </span>
+            <ChevronRight size={17} />
+          </button>
+
+          <div className="fashion-checkout-block">
+            <div className="fashion-checkout-label">Price summary</div>
+            <Row label="Bag total" value={formatINR(ctx.subtotal)} />
+            <Row label="Express delivery" value={ctx.delivery === 0 ? 'FREE' : formatINR(ctx.delivery)} />
+            {ctx.discount > 0 && <Row label="Savings" value={`−${formatINR(ctx.discount)}`} accent />}
+            <div style={{ borderTop: '1px dashed var(--fashion-line)', margin: '10px 0' }} />
+            <Row label="Total" value={formatINR(ctx.total)} bold />
+          </div>
+
+          <motion.button
+            type="button"
+            className="fashion-primary"
+            style={{ width: '100%', minHeight: 52 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => go('checkout')}
+          >
+            Checkout · {formatINR(ctx.total)} <ArrowRight size={17} />
+          </motion.button>
+        </main>
+      )}
+    </div>
+  )
+}
+
+function LegacyCartScreen({ go }) {
   const ctx = useApp()
   return (
     <div className="fade-in">
@@ -904,6 +2055,136 @@ function Row({ label, value, bold, accent }) {
 }
 
 function CheckoutScreen({ go, back }) {
+  const ctx = useApp()
+  const [code, setCode] = useState('')
+  const [pay, setPay] = useState('UPI')
+  const [slot, setSlot] = useState('express')
+  const address = ctx.addresses.find((item) => item.default) || ctx.addresses[0]
+
+  return (
+    <div className="fashion-page">
+      <AppHeader title="Checkout" onBack={back} />
+      <main className="fashion-main">
+        <div className="fashion-speed-card" style={{ marginTop: 0 }}>
+          <span className="fashion-speed-icon"><Zap size={20} fill="currentColor" /></span>
+          <span>
+            <small>Estimated arrival</small>
+            <strong>Today, by 4:15 PM · 28 mins</strong>
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className="fashion-checkout-block"
+          style={{ width: '100%', textAlign: 'left' }}
+          onClick={() => go('addresses')}
+        >
+          <div className="fashion-checkout-label"><MapPin size={17} /> Delivery address</div>
+          <strong style={{ display: 'block', fontSize: 12 }}>{address?.name} · {address?.label}</strong>
+          <span style={{ display: 'block', marginTop: 4, color: 'var(--fashion-muted)', fontSize: 10, lineHeight: 1.5 }}>
+            {address?.line}, {address?.city} — {address?.pincode}
+          </span>
+        </button>
+
+        <div className="fashion-checkout-block">
+          <div className="fashion-checkout-label"><Clock3 size={17} /> Delivery slot</div>
+          <div className="fashion-slot-grid">
+            <button type="button" className={`fashion-slot ${slot === 'express' ? 'active' : ''}`} onClick={() => setSlot('express')}>
+              <Zap size={14} /> Express<br />28 mins
+            </button>
+            <button type="button" className={`fashion-slot ${slot === 'evening' ? 'active' : ''}`} onClick={() => setSlot('evening')}>
+              <Clock3 size={14} /> Evening<br />6–7 PM
+            </button>
+          </div>
+        </div>
+
+        <div className="fashion-checkout-block">
+          <div className="fashion-checkout-label"><Sparkles size={17} /> Apply offer</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              value={code}
+              onChange={(event) => setCode(event.target.value.toUpperCase())}
+              placeholder="Enter coupon"
+              style={{ minWidth: 0, flex: 1, height: 44, padding: '0 12px', border: '1px solid var(--fashion-line)', borderRadius: 12, outline: 'none' }}
+            />
+            <button
+              type="button"
+              className="fashion-secondary"
+              style={{ minHeight: 44, padding: '0 14px' }}
+              onClick={() => {
+                if (['TEAL100', 'SUMMER20', 'FREESHIP'].includes(code)) {
+                  ctx.setPromo(code)
+                  ctx.showToast('Offer applied')
+                } else {
+                  ctx.showToast('Try SUMMER20')
+                }
+              }}
+            >
+              Apply
+            </button>
+          </div>
+          <button type="button" onClick={() => setCode('SUMMER20')} style={{ marginTop: 9, color: 'var(--fashion-accent)', fontSize: 10, fontWeight: 800 }}>
+            Use SUMMER20 · 20% off
+          </button>
+        </div>
+
+        <div className="fashion-checkout-block">
+          <div className="fashion-checkout-label"><CreditCard size={17} /> Payment</div>
+          {['UPI', 'Card', 'Cash on Delivery', 'Wallet'].map((method) => (
+            <button
+              key={method}
+              type="button"
+              onClick={() => setPay(method)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--fashion-line)', textAlign: 'left' }}
+            >
+              <span
+                style={{
+                  width: 18,
+                  height: 18,
+                  display: 'grid',
+                  placeItems: 'center',
+                  borderRadius: '50%',
+                  border: `2px solid ${pay === method ? 'var(--fashion-accent)' : '#d8d4dd'}`,
+                }}
+              >
+                {pay === method && <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--fashion-accent)' }} />}
+              </span>
+              <span style={{ flex: 1, fontSize: 12, fontWeight: 700 }}>{method}</span>
+              {pay === method && <CheckCircle2 size={17} color="var(--fashion-accent)" />}
+            </button>
+          ))}
+        </div>
+
+        <div className="fashion-checkout-block">
+          <div className="fashion-checkout-label">Price summary</div>
+          <Row label="Subtotal" value={formatINR(ctx.subtotal)} />
+          <Row label="Express delivery" value={ctx.delivery === 0 ? 'FREE' : formatINR(ctx.delivery)} />
+          {ctx.discount > 0 && <Row label="Offer savings" value={`−${formatINR(ctx.discount)}`} accent />}
+          <div style={{ borderTop: '1px dashed var(--fashion-line)', margin: '10px 0' }} />
+          <Row label="Total to pay" value={formatINR(ctx.total)} bold />
+        </div>
+
+        <motion.button
+          type="button"
+          className="fashion-primary"
+          style={{ width: '100%', minHeight: 54 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            ctx.placeOrder(pay)
+            go('success')
+          }}
+        >
+          Confirm & pay {formatINR(ctx.total)}
+        </motion.button>
+        <p style={{ marginTop: 10, color: 'var(--fashion-muted)', fontSize: 9, textAlign: 'center' }}>
+          Authentic products · Secure payment · Easy returns
+        </p>
+      </main>
+    </div>
+  )
+}
+
+function LegacyCheckoutScreen({ go, back }) {
   const ctx = useApp()
   const [code, setCode] = useState('')
   const [pay, setPay] = useState('UPI')
@@ -1041,14 +2322,23 @@ function CheckoutScreen({ go, back }) {
 
 function SuccessScreen({ onDone }) {
   return (
-    <div className="paper-bg fade-in" style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
-      <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--teal-light)', display: 'grid', placeItems: 'center', marginBottom: 20, color: 'var(--teal)' }}>
-        <Package size={36} />
-      </div>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, color: 'var(--slate)' }}>Order Placed!</h2>
-      <p style={{ color: 'var(--muted)', margin: '10px 0 28px', lineHeight: 1.5 }}>Your apparel is being packed. Track live status from My Orders.</p>
-      <button type="button" className="btn btn-primary" onClick={onDone}>
-        Track Order
+    <div className="fashion-page" style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
+      <motion.div
+        initial={{ scale: 0.7, rotate: -8 }}
+        animate={{ scale: 1, rotate: 0 }}
+        style={{ width: 88, height: 88, borderRadius: 28, background: 'var(--fashion-accent-soft)', display: 'grid', placeItems: 'center', marginBottom: 20, color: 'var(--fashion-accent)' }}
+      >
+        <Zap size={38} fill="currentColor" />
+      </motion.div>
+      <span className="fashion-kicker" style={{ color: 'var(--fashion-accent-dark)', background: 'var(--fashion-accent-soft)', borderColor: '#f0d8d2' }}>
+        Express confirmed
+      </span>
+      <h2 style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 800, color: 'var(--fashion-black)' }}>Your look is on the way.</h2>
+      <p style={{ maxWidth: 270, color: 'var(--fashion-muted)', margin: '10px 0 24px', fontSize: 12, lineHeight: 1.6 }}>
+        We’re preparing it now. Estimated arrival: <strong>today by 4:15 PM.</strong>
+      </p>
+      <button type="button" className="fashion-primary" onClick={onDone}>
+        Track express order <ArrowRight size={16} />
       </button>
     </div>
   )
@@ -1186,13 +2476,48 @@ function AddressesScreen({ back }) {
   const ctx = useApp()
   const [show, setShow] = useState(false)
   const [form, setForm] = useState({ label: 'Home', name: '', phone: '', line: '', city: '', pincode: '' })
+  const [locating, setLocating] = useState(false)
+  const [locationNote, setLocationNote] = useState('')
+
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationNote('Location is not supported on this device. Enter the address manually.')
+      return
+    }
+    setLocating(true)
+    setLocationNote('Finding your precise delivery location…')
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setForm((current) => ({
+          ...current,
+          line: `Current location · ${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`,
+          city: current.city || 'Chennai',
+        }))
+        setLocationNote('Location detected. Add house number and landmark for a faster handoff.')
+        setLocating(false)
+      },
+      () => {
+        setLocationNote('We could not access your location. Allow location permission or enter it manually.')
+        setLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+    )
+  }
 
   return (
-    <div className="fade-in">
-      <AppHeader title="Addresses" onBack={back} right={<button type="button" onClick={() => setShow(true)} style={{ color: 'white' }}><Plus size={22} /></button>} />
-      <div style={{ padding: 16 }}>
+    <div className="fade-in fashion-address-page">
+      <AppHeader title="Delivery addresses" onBack={back} right={<button type="button" onClick={() => setShow(true)} aria-label="Add address"><Plus size={22} /></button>} />
+      <div className="fashion-address-list">
+        <button type="button" className="fashion-locate-card" onClick={() => { setShow(true); window.setTimeout(useCurrentLocation, 100) }}>
+          <span><LocateFixed size={21} /></span>
+          <div>
+            <strong>Use current location</strong>
+            <small>Detect your location for the quickest delivery ETA</small>
+          </div>
+          <ChevronRight size={18} />
+        </button>
         {ctx.addresses.map((a) => (
-          <div key={a.id} className="card" style={{ padding: 16, marginBottom: 12 }}>
+          <div key={a.id} className="fashion-saved-address">
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <strong>{a.label}</strong>
               {a.default ? <span className="badge badge-teal">Default</span> : (
@@ -1217,28 +2542,73 @@ function AddressesScreen({ back }) {
       </div>
       {show && (
         <div className="modal-backdrop" onClick={() => setShow(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h3 style={{ fontFamily: 'var(--font-display)' }}>Add Address</h3>
+          <div className="modal fashion-address-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="fashion-address-modal-head">
+              <div>
+                <small>30–60 MIN DELIVERY</small>
+                <h3>Add delivery address</h3>
+              </div>
               <button type="button" onClick={() => setShow(false)}><X size={20} /></button>
             </div>
-            {['label', 'name', 'phone', 'line', 'city', 'pincode'].map((k) => (
-              <div className="field" key={k} style={{ marginBottom: 12 }}>
-                <label style={{ textTransform: 'capitalize' }}>{k}</label>
-                <input value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
-              </div>
-            ))}
+
+            <div className="fashion-location-map">
+              <span className={locating ? 'locating' : ''}><MapPin size={24} fill="currentColor" /></span>
+              <div className="fashion-map-road road-one" />
+              <div className="fashion-map-road road-two" />
+              <button type="button" onClick={useCurrentLocation} disabled={locating}>
+                <LocateFixed size={16} /> {locating ? 'Locating…' : 'Use my current location'}
+              </button>
+            </div>
+            {locationNote && <p className="fashion-location-note">{locationNote}</p>}
+
+            <div className="fashion-address-labels">
+              {['Home', 'Work', 'Other'].map((label) => (
+                <button
+                  type="button"
+                  key={label}
+                  className={form.label === label ? 'active' : ''}
+                  onClick={() => setForm({ ...form, label })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="fashion-address-fields">
+              {[
+                ['name', 'Receiver name', 'Who is receiving the order?'],
+                ['phone', 'Mobile number', '10-digit mobile number'],
+                ['line', 'House / flat / street', 'House no., building, street and landmark'],
+                ['city', 'City', 'Chennai'],
+                ['pincode', 'Pincode', '600040'],
+              ].map(([key, label, placeholder]) => (
+                <div className={`field ${key === 'line' ? 'wide' : ''}`} key={key}>
+                  <label>{label}</label>
+                  <input
+                    value={form[key]}
+                    placeholder={placeholder}
+                    inputMode={key === 'phone' || key === 'pincode' ? 'numeric' : undefined}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  />
+                </div>
+              ))}
+            </div>
             <button
               type="button"
-              className="btn btn-primary btn-block"
+              className="fashion-primary fashion-save-address"
+              disabled={!form.name || !form.phone || !form.line || !form.city || !form.pincode}
               onClick={() => {
-                ctx.setAddresses((list) => [...list, { ...form, id: `a${Date.now()}`, default: false }])
+                ctx.setAddresses((list) => [...list, { ...form, id: `a${Date.now()}`, default: list.length === 0 }])
                 setShow(false)
+                setLocationNote('')
                 ctx.showToast('Address added')
               }}
             >
-              Save Address
+              Save & deliver here
             </button>
+            <p className="fashion-address-assurance">
+              <Zap size={13} fill="currentColor" /> Precise addresses help us maintain your express ETA
+            </p>
           </div>
         </div>
       )}

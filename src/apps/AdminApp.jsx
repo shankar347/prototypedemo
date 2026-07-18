@@ -79,7 +79,7 @@ export default function AdminApp() {
               height: 42,
               borderRadius: '50%',
               objectFit: 'cover',
-              background: '#EBF5FB',
+              background: '#FFF1F2',
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
             }}
           />
@@ -172,7 +172,7 @@ function AdminLogin({ onLogin }) {
               height: 56,
               borderRadius: '50%',
               objectFit: 'cover',
-              background: '#EBF5FB',
+              background: '#FFF1F2',
               boxShadow: '0 6px 16px rgba(47,143,212,0.2)',
             }}
           />

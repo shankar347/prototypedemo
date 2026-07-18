@@ -140,7 +140,7 @@ function DriverLogin({ onSend }) {
             height: 56,
             borderRadius: '50%',
             objectFit: 'cover',
-            background: '#EBF5FB',
+            background: '#FFF1F2',
           }}
         />
       </div>
@@ -180,7 +180,7 @@ function DriverHome({ online, setOnline, requests, active, stage, onAccept, onRe
     <div className="fade-in">
       <header
         style={{
-          background: 'linear-gradient(135deg, #7bd5f5, #1e4a6e)',
+          background: 'linear-gradient(135deg, #fb7185, #9f1239)',
           color: 'white',
           padding: '18px 16px 20px',
           position: 'relative',
@@ -198,7 +198,7 @@ function DriverHome({ online, setOnline, requests, active, stage, onAccept, onRe
                 height: 36,
                 borderRadius: '50%',
                 objectFit: 'cover',
-                background: '#EBF5FB',
+                background: '#FFF1F2',
               }}
             />
             <div>
@@ -340,12 +340,12 @@ function MapScreen({ active }) {
         {/* Decorative map grid */}
         <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.35 }}>
           {Array.from({ length: 12 }).map((_, i) => (
-            <line key={`h${i}`} x1="0" y1={i * 40} x2="500" y2={i * 40} stroke="#1e4a6e" strokeWidth="1" />
+            <line key={`h${i}`} x1="0" y1={i * 40} x2="500" y2={i * 40} stroke="#9f1239" strokeWidth="1" />
           ))}
           {Array.from({ length: 10 }).map((_, i) => (
-            <line key={`v${i}`} x1={i * 45} y1="0" x2={i * 45} y2="500" stroke="#1e4a6e" strokeWidth="1" />
+            <line key={`v${i}`} x1={i * 45} y1="0" x2={i * 45} y2="500" stroke="#9f1239" strokeWidth="1" />
           ))}
-          <path d="M40 360 Q120 200 200 280 T380 120" fill="none" stroke="#4db8e8" strokeWidth="4" strokeDasharray="8 6" />
+          <path d="M40 360 Q120 200 200 280 T380 120" fill="none" stroke="#e11d48" strokeWidth="4" strokeDasharray="8 6" />
         </svg>
         <div className="card" style={{ padding: 16, zIndex: 1, textAlign: 'center', maxWidth: 280 }}>
           <Navigation size={28} color="var(--teal)" style={{ margin: '0 auto 8px' }} />
@@ -367,7 +367,7 @@ function SupportScreen({ notify }) {
   ])
   return (
     <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-      <header style={{ padding: 16, background: 'linear-gradient(135deg, #7bd5f5, #1e4a6e)', color: 'white' }}>
+      <header style={{ padding: 16, background: 'linear-gradient(135deg, #fb7185, #9f1239)', color: 'white' }}>
         <h2 style={{ fontFamily: 'var(--font-display)' }}>Support & Safety</h2>
       </header>
       <div style={{ padding: 16, flex: 1 }}>

@@ -6,6 +6,8 @@ const AppContext = createContext(null)
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null)
   const [cart, setCart] = useState([])
+  const [wishlist, setWishlist] = useState([])
+  const [recentlyViewed, setRecentlyViewed] = useState([])
   const [addresses, setAddresses] = useState(ADDRESSES)
   const [orders, setOrders] = useState(ORDERS)
   const [toast, setToast] = useState('')
@@ -37,6 +39,21 @@ export function AppProvider({ children }) {
   }
 
   const removeFromCart = (key) => setCart((prev) => prev.filter((i) => i.key !== key))
+
+  const toggleWishlist = (product) => {
+    setWishlist((prev) =>
+      prev.some((item) => item.id === product.id)
+        ? prev.filter((item) => item.id !== product.id)
+        : [product, ...prev],
+    )
+  }
+
+  const trackRecentlyViewed = (product) => {
+    setRecentlyViewed((prev) => [
+      product,
+      ...prev.filter((item) => item.id !== product.id),
+    ].slice(0, 8))
+  }
 
   const clearCart = () => {
     setCart([])
@@ -78,6 +95,10 @@ export function AppProvider({ children }) {
       updateQty,
       removeFromCart,
       clearCart,
+      wishlist,
+      toggleWishlist,
+      recentlyViewed,
+      trackRecentlyViewed,
       cartCount,
       subtotal,
       delivery,
@@ -94,7 +115,7 @@ export function AppProvider({ children }) {
       showToast,
       products: PRODUCTS,
     }),
-    [user, cart, cartCount, subtotal, delivery, discount, total, promo, addresses, orders, toast, showToast],
+    [user, cart, wishlist, recentlyViewed, cartCount, subtotal, delivery, discount, total, promo, addresses, orders, toast, showToast],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
