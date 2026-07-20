@@ -18,8 +18,10 @@
   --bg: #faf8f5;
   --brand-grad: linear-gradient(135deg, #fb7185, #e11d48 55%, #9f1239);
   min-height: 100%;
+  height: 100%;
   color: var(--fashion-ink);
   background: var(--fashion-bg);
+  isolation: isolate;
 }
 
 .fashion-app-stage {
@@ -311,6 +313,7 @@
 .fashion-campaign-slider {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   border-radius: 21px;
   background: var(--fashion-black);
   box-shadow: 0 12px 28px rgba(34, 27, 22, 0.16);
@@ -385,11 +388,13 @@
   bottom: 12px;
   display: flex;
   gap: 5px;
+  pointer-events: auto;
 }
 
 .fashion-campaign-dots button {
   width: 6px;
   height: 6px;
+  flex: 0 0 auto;
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.45);
   transition: width 0.25s ease, background 0.25s ease;
@@ -1649,7 +1654,7 @@
 }
 
 .fashion-footer {
-  margin: 32px -16px -28px;
+  margin: 32px -16px 0;
   padding: 28px 20px 34px;
   color: rgba(255, 255, 255, 0.64);
   background: var(--fashion-black);
@@ -1666,17 +1671,29 @@
 }
 
 .fashion-app .bottom-nav {
-  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.96);
-  border-color: var(--fashion-line);
+  position: relative;
+  z-index: 70;
+  min-height: 68px;
+  padding: 10px 2px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: #ffffff;
+  border-top: 1px solid var(--fashion-line);
+  box-shadow: 0 -10px 28px rgba(28, 22, 18, 0.08);
 }
 
 .fashion-app .bottom-nav button {
   min-width: 0;
-  flex: 1;
-  gap: 3px;
+  flex: 1 1 0;
+  gap: 4px;
   color: #85818b;
-  font-size: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.fashion-app .bottom-nav button svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
 }
 
 .fashion-app .bottom-nav button.active {
@@ -1685,6 +1702,14 @@
 
 .fashion-app .bottom-nav button.active svg {
   filter: drop-shadow(0 4px 6px rgba(225, 29, 72, 0.22));
+}
+
+.fashion-app .fashion-main {
+  padding-bottom: 20px;
+}
+
+.fashion-app .fashion-page {
+  overflow-x: clip;
 }
 
 .fashion-app > .toast {

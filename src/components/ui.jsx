@@ -113,14 +113,21 @@ export function PhoneShell({ children, nav, overlay, className = '' }) {
 
 export function BottomNav({ items, active, onChange }) {
   return (
-    <nav className="bottom-nav">
+    <nav className="bottom-nav" aria-label="Primary">
       {items.map((item) => {
         const Icon = item.icon
         const isActive = active === item.id
         return (
-          <button key={item.id} className={isActive ? 'active' : ''} onClick={() => onChange(item.id)} type="button">
-            <Icon size={22} strokeWidth={isActive ? 2.4 : 2} />
-            {item.label}
+          <button
+            key={item.id}
+            className={isActive ? 'active' : ''}
+            onClick={() => onChange(item.id)}
+            type="button"
+            aria-current={isActive ? 'page' : undefined}
+            aria-label={item.label}
+          >
+            <Icon size={20} strokeWidth={isActive ? 2.4 : 2} />
+            <span>{item.label}</span>
           </button>
         )
       })}
