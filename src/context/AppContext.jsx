@@ -2,6 +2,8 @@ import { createContext, useContext, useMemo, useState, useCallback } from 'react
 import { PRODUCTS, ADDRESSES, ORDERS } from '../data/mockData'
 
 const AppContext = createContext(null)
+const TRY_BUY_LIMIT = 3
+const FASHION_CATEGORIES = ['men', 'women', 'kids', 'accessories', 'footwear', 'fragrances', 'sports', 'oversized', 'streetwear', 'ethnic', 'luxury']
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -12,30 +14,69 @@ export function AppProvider({ children }) {
   const [orders, setOrders] = useState(ORDERS)
   const [toast, setToast] = useState('')
   const [promo, setPromo] = useState(null)
+  const [storeMode, setStoreModeState] = useState(() => sessionStorage.getItem('storeMode') || 'fashion')
+  const [tryBuyAcknowledged, setTryBuyAcknowledged] = useState(false)
+
+  const setStoreMode = useCallback((mode) => {
+    setStoreModeState(mode)
+    sessionStorage.setItem('storeMode', mode)
+  }, [])
 
   const showToast = useCallback((msg) => {
     setToast(msg)
     setTimeout(() => setToast(''), 2200)
   }, [])
 
-  const addToCart = (product, size, color, qty = 1) => {
+  const selectedAddress = addresses.find((a) => a.default) || addresses[0] || null
+  const locationReady = Boolean(selectedAddress)
+
+  const tryBuyCount = cart.reduce(
+    (sum, item) => sum + (item.tryBuy && item.product.belongsToDarkStore ? item.qty : 0),
+    0,
+  )
+  const hasTryBuyItems = tryBuyCount > 0
+
+  const addToCart = (product, size, color, qty = 1, options = {}) => {
+    const tryBuy = Boolean(options.tryBuy && product.belongsToDarkStore)
+    if (tryBuy && tryBuyCount + qty > TRY_BUY_LIMIT) {
+      showToast('You can add a maximum of 3 Try & Buy products.')
+      return false
+    }
     setCart((prev) => {
-      const key = `${product.id}-${size}-${color}`
+      const key = `${product.id}-${size}-${color}-${tryBuy ? 'try' : 'buy'}`
       const existing = prev.find((i) => i.key === key)
       if (existing) {
-        return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i))
+        const nextQty = existing.qty + qty
+        if (tryBuy && tryBuyCount - existing.qty + nextQty > TRY_BUY_LIMIT) {
+          showToast('You can add a maximum of 3 Try & Buy products.')
+          return prev
+        }
+        return prev.map((i) => (i.key === key ? { ...i, qty: nextQty } : i))
       }
-      return [...prev, { key, product, size, color, qty }]
+      return [...prev, { key, product, size, color, qty, tryBuy }]
     })
-    showToast('Added to cart')
+    showToast(tryBuy ? 'Added to Try & Buy bag' : 'Added to cart')
+    return true
   }
 
   const updateQty = (key, delta) => {
-    setCart((prev) =>
-      prev
-        .map((i) => (i.key === key ? { ...i, qty: Math.max(0, i.qty + delta) } : i))
-        .filter((i) => i.qty > 0),
-    )
+    setCart((prev) => {
+      const item = prev.find((i) => i.key === key)
+      if (!item) return prev
+      const nextQty = item.qty + delta
+      if (nextQty <= 0) return prev.filter((i) => i.key !== key)
+      if (item.tryBuy && item.product.belongsToDarkStore) {
+        const otherTryBuy = prev.reduce(
+          (sum, i) => sum + (i.key !== key && i.tryBuy && i.product.belongsToDarkStore ? i.qty : 0),
+          0,
+        )
+        if (otherTryBuy + nextQty > TRY_BUY_LIMIT) {
+          showToast('You can add a maximum of 3 Try & Buy products.')
+          return prev
+        }
+      }
+      return prev.map((i) => (i.key === key ? { ...i, qty: nextQty } : i))
+    })
   }
 
   const removeFromCart = (key) => setCart((prev) => prev.filter((i) => i.key !== key))
@@ -58,20 +99,44 @@ export function AppProvider({ children }) {
   const clearCart = () => {
     setCart([])
     setPromo(null)
+    setTryBuyAcknowledged(false)
+  }
+
+  const fashionProducts = PRODUCTS.filter(
+    (p) => !p.belongsToDarkStore && FASHION_CATEGORIES.includes(p.category),
+  )
+  const darkStoreProducts = PRODUCTS.filter((p) => p.belongsToDarkStore)
+  const visibleProducts = storeMode === 'darkstore' ? darkStoreProducts : fashionProducts
+
+  const linePrice = (item) => {
+    if (item.tryBuy && item.product.belongsToDarkStore) {
+      return (item.product.tryAndBuyPrice || item.product.price) * item.qty
+    }
+    return item.product.price * item.qty
   }
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
-  const subtotal = cart.reduce((s, i) => s + i.product.price * i.qty, 0)
+  const subtotal = cart.reduce((s, i) => s + linePrice(i), 0)
   const delivery = subtotal > 999 || subtotal === 0 ? 0 : 49
   const discount = promo === 'TEAL100' ? 100 : promo === 'SUMMER20' ? Math.round(subtotal * 0.2) : promo === 'FREESHIP' ? delivery : 0
   const total = Math.max(0, subtotal + delivery - discount)
 
   const placeOrder = (payment) => {
-    const addr = addresses.find((a) => a.default) || addresses[0]
+    if (hasTryBuyItems && !tryBuyAcknowledged) {
+      showToast('Please acknowledge Try & Buy terms before placing the order.')
+      return null
+    }
+    const addr = selectedAddress
     const newOrder = {
       id: `ORD-${Math.floor(20000 + Math.random() * 9000)}`,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      items: cart.map((c) => ({ title: c.product.title, brand: c.product.brand, qty: c.qty, price: c.product.price })),
+      items: cart.map((c) => ({
+        title: c.product.title,
+        brand: c.product.brand,
+        qty: c.qty,
+        price: c.tryBuy ? c.product.tryAndBuyPrice || c.product.price : c.product.price,
+        tryBuy: c.tryBuy,
+      })),
       amount: total,
       payment,
       status: 'Placed',
@@ -79,6 +144,7 @@ export function AppProvider({ children }) {
       steps: ['Placed', 'Packed', 'Picked Up', 'Out for Delivery', 'Delivered'],
       stepIndex: 0,
       address: addr,
+      tryBuy: hasTryBuyItems,
     }
     setOrders((o) => [newOrder, ...o])
     clearCart()
@@ -114,8 +180,45 @@ export function AppProvider({ children }) {
       toast,
       showToast,
       products: PRODUCTS,
+      fashionProducts,
+      darkStoreProducts,
+      visibleProducts,
+      storeMode,
+      setStoreMode,
+      locationReady,
+      selectedAddress,
+      tryBuyCount,
+      hasTryBuyItems,
+      tryBuyAcknowledged,
+      setTryBuyAcknowledged,
+      tryBuyLimit: TRY_BUY_LIMIT,
     }),
-    [user, cart, wishlist, recentlyViewed, cartCount, subtotal, delivery, discount, total, promo, addresses, orders, toast, showToast],
+    [
+      user,
+      cart,
+      wishlist,
+      recentlyViewed,
+      cartCount,
+      subtotal,
+      delivery,
+      discount,
+      total,
+      promo,
+      addresses,
+      orders,
+      toast,
+      showToast,
+      storeMode,
+      setStoreMode,
+      locationReady,
+      selectedAddress,
+      tryBuyCount,
+      hasTryBuyItems,
+      tryBuyAcknowledged,
+      fashionProducts,
+      darkStoreProducts,
+      visibleProducts,
+    ],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Home,
@@ -11,8 +11,10 @@ import {
   Siren,
   LogOut,
   Check,
-  X,
-  } from 'lucide-react'
+  Upload,
+  FileText,
+  Clock3,
+} from 'lucide-react'
 import { PhoneShell, BottomNav, GeometricAccent } from '../components/ui'
 import { DRIVER_REQUESTS } from '../data/mockData'
 
@@ -27,6 +29,7 @@ const DRIVER_STAGES = ['Navigate to shop', 'Picked Up', 'En Route', 'Delivered']
 
 export default function DriverApp() {
   const [authed, setAuthed] = useState(false)
+  const [approvalStatus, setApprovalStatus] = useState(() => sessionStorage.getItem('driverApproval') || 'pending_docs')
   const [screen, setScreen] = useState('login')
   const [tab, setTab] = useState('home')
   const [online, setOnline] = useState(true)
@@ -40,6 +43,24 @@ export default function DriverApp() {
     setTimeout(() => setToast(''), 2000)
   }
 
+  const setApproval = (status) => {
+    setApprovalStatus(status)
+    sessionStorage.setItem('driverApproval', status)
+  }
+
+  // Auto-assign first available request when online, approved, and idle
+  useEffect(() => {
+    if (!authed || approvalStatus !== 'approved' || !online || active || requests.length === 0) return
+    const timer = window.setTimeout(() => {
+      const next = requests[0]
+      setActive(next)
+      setRequests((rs) => rs.filter((r) => r.id !== next.id))
+      setStage(0)
+      notify(`Order ${next.id} auto-assigned to you`)
+    }, 900)
+    return () => window.clearTimeout(timer)
+  }, [authed, approvalStatus, online, active, requests])
+
   if (!authed) {
     return (
       <PhoneShell>
@@ -50,10 +71,34 @@ export default function DriverApp() {
             onBack={() => setScreen('login')}
             onVerify={() => {
               setAuthed(true)
-              setScreen('home')
+              setScreen(approvalStatus === 'approved' ? 'home' : 'approval')
             }}
           />
         )}
+      </PhoneShell>
+    )
+  }
+
+  if (approvalStatus !== 'approved') {
+    return (
+      <PhoneShell>
+        <DriverApprovalGate
+          status={approvalStatus}
+          onSubmitDocs={() => {
+            setApproval('pending_review')
+            notify('Documents submitted — waiting for admin approval')
+          }}
+          onSimulateApprove={() => {
+            setApproval('approved')
+            setScreen('home')
+            notify('Admin approved your documents')
+          }}
+          onLogout={() => {
+            setAuthed(false)
+            setScreen('login')
+          }}
+        />
+        {toast && <div className="toast">{toast}</div>}
       </PhoneShell>
     )
   }
@@ -75,19 +120,8 @@ export default function DriverApp() {
         <DriverHome
           online={online}
           setOnline={setOnline}
-          requests={requests}
           active={active}
           stage={stage}
-          onAccept={(r) => {
-            setActive(r)
-            setRequests([])
-            setStage(0)
-            notify('Delivery accepted')
-          }}
-          onReject={(id) => {
-            setRequests((rs) => rs.filter((r) => r.id !== id))
-            notify('Request rejected')
-          }}
           onAdvance={() => {
             if (stage < DRIVER_STAGES.length - 1) {
               setStage(stage + 1)
@@ -122,6 +156,48 @@ export default function DriverApp() {
       )}
       {toast && <div className="toast">{toast}</div>}
     </PhoneShell>
+  )
+}
+
+function DriverApprovalGate({ status, onSubmitDocs, onSimulateApprove, onLogout }) {
+  return (
+    <div className="fade-in" style={{ padding: 24, minHeight: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src="/logo.png" alt="KudiCart" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+          <strong style={{ fontFamily: 'var(--font-display)' }}>Driver Onboarding</strong>
+        </div>
+        <button type="button" className="btn btn-ghost" style={{ height: 36 }} onClick={onLogout}><LogOut size={16} /></button>
+      </div>
+      <div className="card" style={{ padding: 20 }}>
+        <FileText size={28} color="var(--teal)" style={{ marginBottom: 12 }} />
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, marginBottom: 8, color: 'var(--slate)' }}>
+          {status === 'pending_docs' ? 'Upload documents' : 'Waiting for admin approval'}
+        </h2>
+        <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.55, marginBottom: 16 }}>
+          You can take orders only after document upload and admin approval. Accept / Reject is disabled — orders are auto-assigned once approved.
+        </p>
+        {status === 'pending_docs' ? (
+          <>
+            <div className="field" style={{ marginBottom: 10 }}><label>ID proof</label><input type="file" /></div>
+            <div className="field" style={{ marginBottom: 10 }}><label>Driving license</label><input type="file" /></div>
+            <div className="field" style={{ marginBottom: 16 }}><label>Vehicle insurance</label><input type="file" /></div>
+            <button type="button" className="btn btn-primary btn-block" onClick={onSubmitDocs}>
+              <Upload size={16} /> Submit for admin approval
+            </button>
+          </>
+        ) : (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, color: 'var(--muted)', fontSize: 13 }}>
+              <Clock3 size={16} /> Review usually takes a few hours
+            </div>
+            <button type="button" className="btn btn-primary btn-block" onClick={onSimulateApprove}>
+              <Check size={16} /> Simulate admin approve (demo)
+            </button>
+          </>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -175,7 +251,7 @@ function DriverOtp({ onBack, onVerify }) {
   )
 }
 
-function DriverHome({ online, setOnline, requests, active, stage, onAccept, onReject, onAdvance, onOpenDetail }) {
+function DriverHome({ online, setOnline, active, stage, onAdvance, onOpenDetail }) {
   return (
     <div className="fade-in">
       <header
@@ -203,7 +279,7 @@ function DriverHome({ online, setOnline, requests, active, stage, onAccept, onRe
             />
             <div>
               <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}>KudiCart Driver</div>
-              <div style={{ fontSize: 13, opacity: 0.85 }}>Kiran P · Bike</div>
+              <div style={{ fontSize: 13, opacity: 0.85 }}>Kiran P · Bike · Approved</div>
             </div>
           </div>
           <button
@@ -230,43 +306,33 @@ function DriverHome({ online, setOnline, requests, active, stage, onAccept, onRe
       <div style={{ padding: 16 }}>
         {!online && (
           <div className="card" style={{ padding: 20, textAlign: 'center', color: 'var(--muted)' }}>
-            You are offline. Go online to receive delivery requests.
+            You are offline. Go online to receive auto-assigned deliveries.
           </div>
         )}
 
-        {online && !active && requests.map((r) => (
-          <div key={r.id} className="card slide-up" style={{ padding: 18, marginBottom: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <strong>{r.id}</strong>
-              <span className="badge badge-teal">+₹{r.earn}</span>
-            </div>
-            <p style={{ fontSize: 13, marginBottom: 4 }}><strong>Shop:</strong> {r.shop}</p>
-            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 4 }}>{r.shopAddr}</p>
-            <p style={{ fontSize: 13, marginBottom: 4 }}><strong>Customer:</strong> {r.customer}</p>
-            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 12 }}>{r.dropAddr} · {r.distance} · {r.items} items</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <button type="button" className="btn btn-danger" onClick={() => onReject(r.id)}>
-                <X size={16} /> Reject
-              </button>
-              <button type="button" className="btn btn-primary" onClick={() => onAccept(r)}>
-                <Check size={16} /> Accept
-              </button>
-            </div>
+        {online && !active && (
+          <div className="card" style={{ padding: 20, textAlign: 'center' }}>
+            <Clock3 size={28} color="var(--teal)" style={{ margin: '0 auto 10px' }} />
+            <strong style={{ display: 'block', marginBottom: 6 }}>Waiting for auto-assign…</strong>
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>
+              Orders are assigned automatically. Accept and Reject are not available.
+            </p>
           </div>
-        ))}
-
-        {online && !active && requests.length === 0 && (
-          <div className="empty">Waiting for delivery requests…</div>
         )}
 
         {active && (
           <div className="card" style={{ padding: 18 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <strong>Active · {active.id}</strong>
-              <button type="button" onClick={onOpenDetail} style={{ color: 'var(--teal-dark)', fontSize: 13, fontWeight: 600 }}>
-                Details
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <strong>Auto-assigned · {active.id}</strong>
+              <span className="badge badge-teal">+₹{active.earn}</span>
             </div>
+            <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 12 }}>Assigned by system — no accept/reject needed</p>
+            <button type="button" onClick={onOpenDetail} style={{ color: 'var(--teal-dark)', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
+              View details
+            </button>
+            <p style={{ fontSize: 13, marginBottom: 4 }}><strong>Shop:</strong> {active.shop}</p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 4 }}>{active.shopAddr}</p>
+            <p style={{ fontSize: 13, marginBottom: 12 }}><strong>Drop:</strong> {active.dropAddr} · {active.distance}</p>
             <div className="progress-steps" style={{ marginBottom: 20 }}>
               {DRIVER_STAGES.map((s, i) => (
                 <div key={s} className={`step ${i < stage ? 'done' : ''} ${i === stage ? 'active' : ''}`}>
@@ -337,7 +403,6 @@ function MapScreen({ active }) {
           placeItems: 'center',
         }}
       >
-        {/* Decorative map grid */}
         <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.35 }}>
           {Array.from({ length: 12 }).map((_, i) => (
             <line key={`h${i}`} x1="0" y1={i * 40} x2="500" y2={i * 40} stroke="#9f1239" strokeWidth="1" />
@@ -351,7 +416,7 @@ function MapScreen({ active }) {
           <Navigation size={28} color="var(--teal)" style={{ margin: '0 auto 8px' }} />
           <strong>{active ? 'Route optimized' : 'No active delivery'}</strong>
           <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>
-            {active ? `${active.shopAddr} → ${active.dropAddr}` : 'Accept a request to start navigation'}
+            {active ? `${active.shopAddr} → ${active.dropAddr}` : 'Wait for an auto-assigned order to start navigation'}
           </p>
           {active && <p style={{ marginTop: 8, color: 'var(--teal-dark)', fontWeight: 700 }}>ETA 12 min · live traffic</p>}
         </div>

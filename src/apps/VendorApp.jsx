@@ -12,7 +12,6 @@ import {
   LogOut,
   Plus,
   Pencil,
-  Phone,
   ArrowLeft,
   Menu,
   Check,
@@ -304,10 +303,9 @@ function VendorDashboard({ orders, onOpen }) {
           <thead>
             <tr>
               <th>Order</th>
-              <th>Customer</th>
-              <th>Items</th>
+              <th>Items / Size</th>
               <th>Qty</th>
-              <th>Address</th>
+              <th>Payment</th>
               <th></th>
             </tr>
           </thead>
@@ -315,14 +313,13 @@ function VendorDashboard({ orders, onOpen }) {
             {neu.map((o) => (
               <tr key={o.id}>
                 <td>{o.id}</td>
-                <td>{o.customer}</td>
-                <td>{o.items.map((i) => i.title).join(', ')}</td>
+                <td>{o.items.map((i) => `${i.title} (${i.size || '—'})`).join(', ')}</td>
                 <td>{o.items.reduce((s, i) => s + i.qty, 0)}</td>
-                <td>{o.address}</td>
+                <td><span className={`badge ${o.payment === 'COD' ? 'badge-warn' : 'badge-teal'}`}>{o.payment || 'Online'}</span></td>
                 <td><button type="button" className="btn btn-secondary" style={{ height: 36 }} onClick={() => onOpen(o)}>View</button></td>
               </tr>
             ))}
-            {neu.length === 0 && <tr><td colSpan={6}>No new orders</td></tr>}
+            {neu.length === 0 && <tr><td colSpan={5}>No new orders</td></tr>}
           </tbody>
         </table>
       </div>
@@ -370,8 +367,8 @@ function ItemManagement({ items, setItems, notify }) {
                 <th>Category</th>
                 <th>Price</th>
                 <th>Size / Color</th>
-                <th>Stock</th>
-                <th>Active</th>
+                <th>Stock (sale visibility)</th>
+                <th>Active (listed in catalog)</th>
               </tr>
             </thead>
             <tbody>
@@ -388,7 +385,10 @@ function ItemManagement({ items, setItems, notify }) {
                     <button
                       type="button"
                       className={`toggle ${it.stock ? 'on' : ''}`}
-                      onClick={() => setItems((list) => list.map((x) => (x.id === it.id ? { ...x, stock: !x.stock } : x)))}
+                      onClick={() => {
+                        setItems((list) => list.map((x) => (x.id === it.id ? { ...x, stock: !x.stock } : x)))
+                        notify(it.stock ? 'Marked Out of Stock — hidden from sale' : 'Marked In Stock — visible for sale')
+                      }}
                     />
                     <span style={{ marginLeft: 8, fontSize: 12 }}>{it.stock ? 'In Stock' : 'Out of Stock'}</span>
                   </td>
@@ -398,9 +398,10 @@ function ItemManagement({ items, setItems, notify }) {
                       className={`toggle ${it.active ? 'on' : ''}`}
                       onClick={() => {
                         setItems((list) => list.map((x) => (x.id === it.id ? { ...x, active: !x.active } : x)))
-                        notify('Item status updated')
+                        notify(it.active ? 'Item deactivated in catalog' : 'Item activated in catalog')
                       }}
                     />
+                    <span style={{ marginLeft: 8, fontSize: 12 }}>{it.active ? 'Active' : 'Inactive'}</span>
                   </td>
                 </tr>
               ))}
@@ -408,6 +409,9 @@ function ItemManagement({ items, setItems, notify }) {
           </table>
         </div>
       )}
+      <p style={{ marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
+        <strong>Active</strong> controls catalog listing. <strong>Out of Stock</strong> only hides the item from purchase while keeping it in your catalog.
+      </p>
 
       {show && (
         <div className="modal-backdrop" onClick={() => setShow(false)}>
@@ -442,13 +446,19 @@ function OrderManagement({ orders, setOrders, selected, setSelected, notify }) {
           <h3 style={{ fontFamily: 'var(--font-display)' }}>{selected.id}</h3>
           <span className="badge badge-warn">{selected.status}</span>
         </div>
-        <p style={{ marginBottom: 8 }}><strong>Customer:</strong> {selected.customer}</p>
-        <p style={{ marginBottom: 8 }}><strong>Address:</strong> {selected.address}</p>
-        <p style={{ marginBottom: 16 }}><strong>Phone:</strong> {selected.phone}</p>
+        <p style={{ marginBottom: 8 }}>
+          <strong>Payment:</strong>{' '}
+          <span className={`badge ${selected.payment === 'COD' ? 'badge-warn' : 'badge-teal'}`}>
+            {selected.payment === 'COD' ? 'Cash on Delivery' : 'Online Payment'}
+          </span>
+        </p>
+        <p style={{ marginBottom: 16, fontSize: 13, color: 'var(--muted)' }}>
+          Customer name and address are hidden for privacy. Pack by size and prepare for rider pickup.
+        </p>
         <h4 style={{ marginBottom: 8 }}>Items</h4>
         {selected.items.map((i, idx) => (
           <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--line)' }}>
-            <span>{i.title} ×{i.qty}</span>
+            <span>{i.title} ×{i.qty} · Size: <strong>{i.size || '—'}</strong></span>
             <span>{formatINR(i.price * i.qty)}</span>
           </div>
         ))}
@@ -486,9 +496,6 @@ function OrderManagement({ orders, setOrders, selected, setSelected, notify }) {
                 {s}
               </button>
             ))}
-          <a className="btn btn-secondary" href={`tel:${selected.phone}`}>
-            <Phone size={16} /> Contact Customer
-          </a>
         </div>
       </div>
     )
@@ -504,13 +511,14 @@ function OrderManagement({ orders, setOrders, selected, setSelected, notify }) {
       <div className="table-wrap">
         <table className="data">
           <thead>
-            <tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Stage</th><th></th></tr>
+            <tr><th>Order</th><th>Size</th><th>Payment</th><th>Total</th><th>Status</th><th>Stage</th><th></th></tr>
           </thead>
           <tbody>
             {list.map((o) => (
               <tr key={o.id}>
                 <td>{o.id}</td>
-                <td>{o.customer}</td>
+                <td>{o.items.map((i) => i.size || '—').join(', ')}</td>
+                <td><span className={`badge ${o.payment === 'COD' ? 'badge-warn' : 'badge-teal'}`}>{o.payment || 'Online'}</span></td>
                 <td>{formatINR(o.total)}</td>
                 <td><span className={`badge ${o.status === 'Delivered' ? 'badge-teal' : o.status === 'New' ? 'badge-warn' : 'badge-slate'}`}>{o.status}</span></td>
                 <td>{o.stage || '—'}</td>
@@ -533,7 +541,9 @@ function TrackOrders({ orders }) {
             <strong>{o.id}</strong>
             <span className="badge badge-teal">{o.stage || o.status}</span>
           </div>
-          <p style={{ fontSize: 13, color: 'var(--muted)' }}>{o.customer} · {o.address}</p>
+          <p style={{ fontSize: 13, color: 'var(--muted)' }}>
+            Payment: {o.payment === 'COD' ? 'Cash on Delivery' : 'Online'} · Sizes: {o.items.map((i) => i.size || '—').join(', ')}
+          </p>
           <div className="progress-steps" style={{ marginTop: 20 }}>
             {STAGES.map((s, i) => {
               const idx = STAGES.indexOf(o.stage || 'Packed')
@@ -548,26 +558,32 @@ function TrackOrders({ orders }) {
 
 function PaymentMgmt() {
   const rows = [
-    { id: 'TX-901', order: 'VO-881', amount: 3197, status: 'Pending payout', note: 'Awaiting admin commission cut' },
+    { id: 'TX-901', order: 'VO-881', amount: 3197, status: 'Pending payout', note: 'Awaiting admin commission cut · txn assigned after settlement' },
     { id: 'TX-880', order: 'VO-872', amount: 3299, status: 'Settled', note: 'Disbursed to vendor' },
+    { id: '—', order: 'VO-880', amount: 2499, status: 'Pending Payment', note: 'TXN not generated yet — shows as Pending until admin creates payout' },
   ]
   return (
-    <div className="table-wrap">
-      <table className="data">
-        <thead><tr><th>Txn</th><th>Order</th><th>Amount</th><th>Status</th><th>Note</th></tr></thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id}>
-              <td>{r.id}</td>
-              <td>{r.order}</td>
-              <td>{formatINR(r.amount)}</td>
-              <td><span className={`badge ${r.status === 'Settled' ? 'badge-teal' : 'badge-warn'}`}>{r.status}</span></td>
-              <td>{r.note}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 12 }}>
+        <strong>TXN —</strong> means the payout transaction ID is not created yet (order still pending settlement). It is not an error — the ID appears once admin processes the payout.
+      </p>
+      <div className="table-wrap">
+        <table className="data">
+          <thead><tr><th>Txn</th><th>Order</th><th>Amount</th><th>Status</th><th>Note</th></tr></thead>
+          <tbody>
+            {rows.map((r, idx) => (
+              <tr key={`${r.order}-${idx}`}>
+                <td>{r.id === '—' ? <span className="badge badge-slate">Pending</span> : r.id}</td>
+                <td>{r.order}</td>
+                <td>{formatINR(r.amount)}</td>
+                <td><span className={`badge ${r.status === 'Settled' ? 'badge-teal' : 'badge-warn'}`}>{r.status}</span></td>
+                <td>{r.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
 
