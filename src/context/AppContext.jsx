@@ -16,6 +16,7 @@ export function AppProvider({ children }) {
   const [promo, setPromo] = useState(null)
   const [storeMode, setStoreModeState] = useState(() => sessionStorage.getItem('storeMode') || 'fashion')
   const [tryBuyAcknowledged, setTryBuyAcknowledged] = useState(false)
+  const [deliveryOption, setDeliveryOption] = useState('express')
 
   const setStoreMode = useCallback((mode) => {
     setStoreModeState(mode)
@@ -31,31 +32,43 @@ export function AppProvider({ children }) {
   const locationReady = Boolean(selectedAddress)
 
   const tryBuyCount = cart.reduce(
-    (sum, item) => sum + (item.tryBuy && item.product.belongsToDarkStore ? item.qty : 0),
+    (sum, item) => sum + (item.product.belongsToDarkStore ? item.qty : 0),
     0,
   )
   const hasTryBuyItems = tryBuyCount > 0
 
   const addToCart = (product, size, color, qty = 1, options = {}) => {
     const tryBuy = Boolean(options.tryBuy && product.belongsToDarkStore)
-    if (tryBuy && tryBuyCount + qty > TRY_BUY_LIMIT) {
-      showToast('You can add a maximum of 3 Try & Buy products.')
-      return false
+    if (product.belongsToDarkStore) {
+      const currentDarkStoreQty = cart.reduce(
+        (sum, item) => sum + (item.product.belongsToDarkStore ? item.qty : 0),
+        0,
+      )
+      if (currentDarkStoreQty + qty > TRY_BUY_LIMIT) {
+        showToast('You can add a maximum of 3 Try & Buy products.')
+        return false
+      }
     }
     setCart((prev) => {
-      const key = `${product.id}-${size}-${color}-${tryBuy ? 'try' : 'buy'}`
+      const key = `${product.id}-${size}-${color}-buy`
       const existing = prev.find((i) => i.key === key)
       if (existing) {
         const nextQty = existing.qty + qty
-        if (tryBuy && tryBuyCount - existing.qty + nextQty > TRY_BUY_LIMIT) {
-          showToast('You can add a maximum of 3 Try & Buy products.')
-          return prev
+        if (product.belongsToDarkStore) {
+          const otherDarkStore = prev.reduce(
+            (sum, i) => sum + (i.key !== key && i.product.belongsToDarkStore ? i.qty : 0),
+            0,
+          )
+          if (otherDarkStore + nextQty > TRY_BUY_LIMIT) {
+            showToast('You can add a maximum of 3 Try & Buy products.')
+            return prev
+          }
         }
         return prev.map((i) => (i.key === key ? { ...i, qty: nextQty } : i))
       }
       return [...prev, { key, product, size, color, qty, tryBuy }]
     })
-    showToast(tryBuy ? 'Added to Try & Buy bag' : 'Added to cart')
+    showToast('Added to cart')
     return true
   }
 
@@ -65,12 +78,12 @@ export function AppProvider({ children }) {
       if (!item) return prev
       const nextQty = item.qty + delta
       if (nextQty <= 0) return prev.filter((i) => i.key !== key)
-      if (item.tryBuy && item.product.belongsToDarkStore) {
-        const otherTryBuy = prev.reduce(
-          (sum, i) => sum + (i.key !== key && i.tryBuy && i.product.belongsToDarkStore ? i.qty : 0),
+      if (item.product.belongsToDarkStore) {
+        const otherDarkStore = prev.reduce(
+          (sum, i) => sum + (i.key !== key && i.product.belongsToDarkStore ? i.qty : 0),
           0,
         )
-        if (otherTryBuy + nextQty > TRY_BUY_LIMIT) {
+        if (otherDarkStore + nextQty > TRY_BUY_LIMIT) {
           showToast('You can add a maximum of 3 Try & Buy products.')
           return prev
         }
@@ -100,6 +113,7 @@ export function AppProvider({ children }) {
     setCart([])
     setPromo(null)
     setTryBuyAcknowledged(false)
+    setDeliveryOption('express')
   }
 
   const fashionProducts = PRODUCTS.filter(
@@ -109,10 +123,11 @@ export function AppProvider({ children }) {
   const visibleProducts = storeMode === 'darkstore' ? darkStoreProducts : fashionProducts
 
   const linePrice = (item) => {
-    if (item.tryBuy && item.product.belongsToDarkStore) {
-      return (item.product.tryAndBuyPrice || item.product.price) * item.qty
-    }
-    return item.product.price * item.qty
+    const useTryBuyPrice = deliveryOption === 'trybuy' && item.product.belongsToDarkStore
+    const unit = useTryBuyPrice
+      ? (item.product.tryAndBuyPrice || item.product.price)
+      : item.product.price
+    return unit * item.qty
   }
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
@@ -122,7 +137,7 @@ export function AppProvider({ children }) {
   const total = Math.max(0, subtotal + delivery - discount)
 
   const placeOrder = (payment) => {
-    if (hasTryBuyItems && !tryBuyAcknowledged) {
+    if (hasTryBuyItems && deliveryOption === 'trybuy' && !tryBuyAcknowledged) {
       showToast('Please acknowledge Try & Buy terms before placing the order.')
       return null
     }
@@ -134,8 +149,10 @@ export function AppProvider({ children }) {
         title: c.product.title,
         brand: c.product.brand,
         qty: c.qty,
-        price: c.tryBuy ? c.product.tryAndBuyPrice || c.product.price : c.product.price,
-        tryBuy: c.tryBuy,
+        price: deliveryOption === 'trybuy' && c.product.belongsToDarkStore
+          ? c.product.tryAndBuyPrice || c.product.price
+          : c.product.price,
+        tryBuy: deliveryOption === 'trybuy' && c.product.belongsToDarkStore,
       })),
       amount: total,
       payment,
@@ -144,7 +161,7 @@ export function AppProvider({ children }) {
       steps: ['Placed', 'Packed', 'Picked Up', 'Out for Delivery', 'Delivered'],
       stepIndex: 0,
       address: addr,
-      tryBuy: hasTryBuyItems,
+      tryBuy: hasTryBuyItems && deliveryOption === 'trybuy',
     }
     setOrders((o) => [newOrder, ...o])
     clearCart()
@@ -192,6 +209,8 @@ export function AppProvider({ children }) {
       tryBuyAcknowledged,
       setTryBuyAcknowledged,
       tryBuyLimit: TRY_BUY_LIMIT,
+      deliveryOption,
+      setDeliveryOption,
     }),
     [
       user,
@@ -218,6 +237,7 @@ export function AppProvider({ children }) {
       fashionProducts,
       darkStoreProducts,
       visibleProducts,
+      deliveryOption,
     ],
   )
 

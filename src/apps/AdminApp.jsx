@@ -131,6 +131,14 @@ export default function AdminApp() {
 
   return (
     <div className="panel-layout">
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="panel-sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <aside className={`panel-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div style={{ padding: '0 10px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
