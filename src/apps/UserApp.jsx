@@ -293,10 +293,9 @@ const FASHION_CATEGORY_IDS = ['men', 'women', 'kids', 'accessories', 'footwear',
 
 const TRY_BUY_DELIVERY_POINTS = [
   'Look for Try & Buy eligible products in your cart.',
-  'Our delivery partner will bring you the products and you can try and buy the ones you like.',
-  'Only pay for the items you keep. Delivery fees is non refundable.',
-  'Not keeping anything? No worries — just the delivery charges will be applicable.',
-  'No return/exchanges allowed after you have made this purchase.',
+  'Our delivery partner will bring the products and you can try them at your doorstep.',
+  'Only pay for the items you keep — no additional Try & Buy charges.',
+  'Return what you do not like on the spot with no extra fees.',
 ]
 
 const EXPRESS_DELIVERY_POINTS = [
@@ -308,8 +307,7 @@ const TRY_BUY_HOW_IT_WORKS = [
   { step: '1', title: 'Add Try & Buy items', copy: 'Choose up to 3 Dark Store products marked with Try & Buy and add them to your bag.' },
   { step: '2', title: 'Select Try & Buy delivery', copy: 'At checkout, pick the Try & Buy delivery option — no extra charges for trying at your doorstep.' },
   { step: '3', title: 'Try at home', copy: 'Our delivery partner brings the items. Try them on comfortably at home within the delivery window.' },
-  { step: '4', title: 'Pay only for what you keep', copy: 'Keep what you love and pay only for those items. Return the rest on the spot.' },
-  { step: '5', title: 'Return fee if needed', copy: 'If you return an item, a small return processing fee applies. Delivery charges are non-refundable.' },
+  { step: '4', title: 'Pay only for what you keep', copy: 'Keep what you love and pay only for those items. Return the rest on the spot with no additional fees.' },
 ]
 
 const PAGE_MOTION = {
@@ -401,7 +399,7 @@ export default function UserApp() {
               }}
             />
           )}
-          {screen === 'home' && <HomeScreen go={go} />}
+          {screen === 'home' && <HomeScreen go={go} splashDone={splashDone} />}
           {screen === 'categories' && <CategoriesScreen go={go} />}
           {screen === 'search' && <SearchScreen go={go} />}
           {screen === 'wishlist' && <WishlistScreen go={go} />}
@@ -431,18 +429,20 @@ export default function UserApp() {
   )
 }
 
-function AppHeader({ title, onBack, right }) {
+function AppHeader({ title, onBack, right, showLogo = true, eta }) {
   return (
     <header className="fashion-subheader">
       {onBack ? (
         <button type="button" onClick={onBack} aria-label="Back">
           <ArrowLeft size={20} />
         </button>
+      ) : showLogo ? (
+        <img src="/logo.png" alt="KudiCart" className="fashion-subheader-logo" />
       ) : (
-        <img src="/logo.png" alt="KudiCart" style={{ width: 38, height: 38, borderRadius: 13, objectFit: 'cover' }} />
+        <span style={{ width: 38 }} />
       )}
       <h1>{title || 'KudiCart'}</h1>
-      {right}
+      {eta ? <span className="fashion-subheader-eta">{eta}</span> : right}
     </header>
   )
 }
@@ -455,7 +455,7 @@ const HEADER_SHOP_CATEGORIES = [
   { id: 'beauty', name: 'Beauty', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop' },
 ]
 
-function DeliveryHeader({ go, activeCategory = 'for-you', onCategoryChange }) {
+function DeliveryHeader({ go, activeCategory = 'for-you', onCategoryChange, showBrandLogo = true }) {
   const ctx = useApp()
   const address = ctx.selectedAddress
   const addressLabel = address?.label?.toLowerCase() || 'home'
@@ -479,6 +479,9 @@ function DeliveryHeader({ go, activeCategory = 'for-you', onCategoryChange }) {
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
       >
+        {showBrandLogo && (
+          <img src="/logo.png" alt="KudiCart" className="fashion-header-brand-logo" />
+        )}
         <div className="fashion-delivery-badge" aria-label={`Delivered in ${deliveryMins} minutes`}>
           <strong>{deliveryMins}</strong>
           <span>Mins</span>
@@ -618,41 +621,61 @@ function SplashIntro({ onComplete }) {
   const [phase, setPhase] = useState('intro')
 
   useEffect(() => {
-    const fadeTimer = window.setTimeout(() => setPhase('exit'), 1100)
-    const doneTimer = window.setTimeout(onComplete, 1650)
+    const growTimer = window.setTimeout(() => setPhase('grow'), 280)
+    const holdTimer = window.setTimeout(() => setPhase('hold'), 900)
+    const exitTimer = window.setTimeout(() => setPhase('exit'), 1500)
+    const doneTimer = window.setTimeout(onComplete, 1950)
     return () => {
-      window.clearTimeout(fadeTimer)
+      window.clearTimeout(growTimer)
+      window.clearTimeout(holdTimer)
+      window.clearTimeout(exitTimer)
       window.clearTimeout(doneTimer)
     }
   }, [onComplete])
+
+  const logoMotion = {
+    intro: { opacity: 1, scale: 0.42, width: 112, height: 112 },
+    grow: { opacity: 1, scale: 1.08, width: 112, height: 112 },
+    hold: { opacity: 1, scale: 1, width: 112, height: 112 },
+    exit: { opacity: 0, scale: 1.18, width: 112, height: 112 },
+  }
 
   return (
     <motion.div
       className="fashion-splash"
       initial={{ opacity: 1 }}
       animate={{ opacity: phase === 'exit' ? 0 : 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: phase === 'exit' ? 0.4 : 0 }}
       aria-hidden={phase === 'exit'}
     >
-      <div className="fashion-splash-bg" />
+      <motion.div
+        className="fashion-splash-bg"
+        animate={{ opacity: phase === 'exit' ? 0 : 1 }}
+        transition={{ duration: 0.4 }}
+      />
       <motion.img
         src="/logo.png"
         alt="KudiCart"
-        className="fashion-splash-logo"
-        initial={{ opacity: 0, scale: 0.82 }}
-        animate={
-          phase === 'intro'
-            ? { opacity: 1, scale: 1, top: '46%', left: '50%', width: 112, height: 112, x: '-50%', y: '-50%' }
-            : { opacity: 0, scale: 1.08, top: '46%', left: '50%', width: 112, height: 112, x: '-50%', y: '-50%' }
-        }
-        transition={{ duration: phase === 'intro' ? 0.55 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="fashion-splash-logo fashion-splash-logo-center"
+        initial={{ opacity: 0, scale: 0.28, top: '46%', left: '50%', x: '-50%', y: '-50%', width: 112, height: 112 }}
+        animate={{
+          ...logoMotion[phase],
+          top: '46%',
+          left: '50%',
+          x: '-50%',
+          y: '-50%',
+        }}
+        transition={{
+          duration: phase === 'grow' ? 0.7 : phase === 'exit' ? 0.4 : 0.35,
+          ease: [0.22, 1, 0.36, 1],
+        }}
       />
-      {phase === 'intro' && (
+      {(phase === 'grow' || phase === 'hold') && (
         <motion.div
           className="fashion-splash-copy"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, duration: 0.35 }}
+          initial={{ opacity: 0, scale: 0.92, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
         >
           <strong>KudiCart</strong>
           <span>Fashion · Try & Buy at your doorstep</span>
@@ -831,7 +854,6 @@ function DeliveryOptionSection({ ctx, setShowHowItWorks }) {
           <div className="fashion-delivery-option-head">
             <span className={`fashion-radio ${ctx.deliveryOption === 'trybuy' ? 'checked' : ''}`} />
             <strong>Try & Buy</strong>
-            <em>No Additional Charges</em>
           </div>
           <ul>
             {TRY_BUY_DELIVERY_POINTS.map((point) => <li key={point}>{point}</li>)}
@@ -865,18 +887,8 @@ function DeliveryOptionSection({ ctx, setShowHowItWorks }) {
   )
 }
 
-function TryBuyPolicyBlock({ compact = false }) {
-  return (
-    <div className={`fashion-trybuy-policy ${compact ? 'compact' : ''}`}>
-      <div className="fashion-checkout-label"><Sparkles size={17} /> Try & Buy Policy</div>
-      <div className="fashion-trybuy-grid">
-        <div><small>Normal Purchase</small><strong>{formatINR(410)}</strong></div>
-        <div><small>Try & Buy Purchase</small><strong>{formatINR(499)}</strong></div>
-        <div><small>Return Charge</small><strong>{formatINR(30)}</strong></div>
-      </div>
-      <p>If you keep the product, no additional return action is required. If you return the product, a {formatINR(30)} return processing fee will be charged.</p>
-    </div>
-  )
+function TryBuyPolicyBlock() {
+  return null
 }
 
 function LoginScreen({ onSend }) {
@@ -1001,7 +1013,7 @@ function OtpScreen({ onBack, onVerify }) {
   )
 }
 
-function HomeScreen({ go }) {
+function HomeScreen({ go, splashDone = true }) {
   const ctx = useApp()
   const isDarkStore = ctx.storeMode === 'darkstore'
   const [heroIndex, setHeroIndex] = useState(0)
@@ -1105,7 +1117,7 @@ function HomeScreen({ go }) {
 
   return (
     <div className="fashion-page">
-      <DeliveryHeader go={go} activeCategory={headerCategory} onCategoryChange={setHeaderCategory} />
+      <DeliveryHeader go={go} activeCategory={headerCategory} onCategoryChange={setHeaderCategory} showBrandLogo={splashDone} />
       {showLocationGate && !ctx.locationReady && <LocationGate go={go} />}
       <main className="fashion-main fashion-main-slikk">
         <HomePromoStrip />
@@ -2468,10 +2480,11 @@ function CartScreen({ go }) {
   const ctx = useApp()
   const address = ctx.selectedAddress
   const [showHowItWorks, setShowHowItWorks] = useState(false)
+  const deliveryEta = ctx.hasTryBuyItems ? '45 mins' : '30 mins'
 
   return (
     <div className="fashion-page">
-      <AppHeader title={`Your bag${ctx.cartCount ? ` (${ctx.cartCount})` : ''}`} />
+      <AppHeader title={`Your bag${ctx.cartCount ? ` (${ctx.cartCount})` : ''}`} eta={deliveryEta} />
       {ctx.cart.length === 0 ? (
         <FashionEmpty
           icon={ShoppingBag}
@@ -2551,17 +2564,14 @@ function CartScreen({ go }) {
           <DeliveryOptionSection ctx={ctx} setShowHowItWorks={setShowHowItWorks} />
 
           {ctx.hasTryBuyItems && ctx.deliveryOption === 'trybuy' && (
-            <>
-              <TryBuyPolicyBlock compact />
-              <label className="fashion-trybuy-ack fashion-checkout-block">
-                <input
-                  type="checkbox"
-                  checked={ctx.tryBuyAcknowledged}
-                  onChange={(e) => ctx.setTryBuyAcknowledged(e.target.checked)}
-                />
-                I understand the Try & Buy pricing and return policy before payment.
-              </label>
-            </>
+            <label className="fashion-trybuy-ack fashion-checkout-block">
+              <input
+                type="checkbox"
+                checked={ctx.tryBuyAcknowledged}
+                onChange={(e) => ctx.setTryBuyAcknowledged(e.target.checked)}
+              />
+              I understand the Try & Buy doorstep trial option before payment.
+            </label>
           )}
 
           <div className="fashion-checkout-block">
@@ -2587,7 +2597,7 @@ function CartScreen({ go }) {
               go('checkout')
             }}
           >
-            Pay {formatINR(ctx.total)} <ArrowRight size={17} />
+            Pay {formatINR(ctx.total)}
           </motion.button>
         </main>
       )}
@@ -2737,25 +2747,14 @@ function CheckoutScreen({ go, back }) {
         </div>
 
         {ctx.hasTryBuyItems && ctx.deliveryOption === 'trybuy' && (
-          <>
-            <TryBuyPolicyBlock />
-            <div className="fashion-checkout-block fashion-trybuy-order">
-              <div className="fashion-checkout-label">Try & Buy order</div>
-              <Row label="Normal Price" value={formatINR(410)} />
-              <Row label="Try & Buy Price" value={formatINR(499)} />
-              <Row label="Refundable Difference" value="As per Try & Buy policy" />
-              <Row label="Return Fee" value={formatINR(30)} />
-              <Row label="Maximum" value={`${ctx.tryBuyLimit} Products`} />
-              <label className="fashion-trybuy-ack">
-                <input
-                  type="checkbox"
-                  checked={ctx.tryBuyAcknowledged}
-                  onChange={(e) => ctx.setTryBuyAcknowledged(e.target.checked)}
-                />
-                I understand the Try & Buy pricing and return policy before payment.
-              </label>
-            </div>
-          </>
+          <label className="fashion-trybuy-ack fashion-checkout-block">
+            <input
+              type="checkbox"
+              checked={ctx.tryBuyAcknowledged}
+              onChange={(e) => ctx.setTryBuyAcknowledged(e.target.checked)}
+            />
+            I understand the Try & Buy doorstep trial option before payment.
+          </label>
         )}
 
         <div className="fashion-checkout-block">

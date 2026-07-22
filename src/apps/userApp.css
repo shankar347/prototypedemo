@@ -102,8 +102,9 @@
   padding: 12px 14px 0;
   color: #fff;
   background:
-    radial-gradient(circle at 90% 0%, rgba(251, 113, 133, 0.3), transparent 36%),
-    linear-gradient(135deg, #151311 0%, #29221f 62%, #831843 145%);
+    radial-gradient(circle at 8% 0%, rgba(79, 195, 247, 0.22), transparent 38%),
+    radial-gradient(circle at 90% 0%, rgba(251, 113, 133, 0.28), transparent 36%),
+    linear-gradient(135deg, #151311 0%, #1a2430 38%, #29221f 62%, #831843 145%);
   box-shadow: 0 8px 26px rgba(17, 17, 20, 0.16);
 }
 
@@ -113,10 +114,18 @@
 
 .fashion-header-delivery-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 12px;
+}
+
+.fashion-header-brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(79, 195, 247, 0.25);
 }
 
 .fashion-delivery-badge {
@@ -184,39 +193,64 @@
 .fashion-header-search-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
   margin-bottom: 10px;
 }
 
 .fashion-trybuy-cta {
   flex: 0 0 auto;
+  align-self: stretch;
   height: 46px;
-  padding: 0 12px;
-  border: none;
+  min-height: 46px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1.5px solid transparent;
   border-radius: 12px;
-  background: var(--fashion-accent);
+  background: linear-gradient(135deg, #fb7185 0%, #e11d48 55%, #9f1239 100%);
   color: #fff;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.04em;
   line-height: 1.15;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.32);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.fashion-trybuy-cta:active {
+  transform: scale(0.97);
 }
 
 .fashion-trybuy-cta.active {
   background: #fff;
   color: var(--fashion-accent);
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 0 0 2px rgba(225, 29, 72, 0.22),
+    0 8px 20px rgba(255, 255, 255, 0.18),
+    inset 0 0 0 1px rgba(225, 29, 72, 0.08);
+  position: relative;
+}
+
+.fashion-trybuy-cta.active::after {
+  content: '';
+  position: absolute;
+  inset: auto 10px 5px;
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, transparent, #e11d48, transparent);
 }
 
 .fashion-search-inline {
   margin-top: 0;
+  margin-bottom: 0;
   height: 46px;
+  min-height: 46px;
   border-radius: 12px;
   border: 1px solid rgba(17, 17, 20, 0.08);
   box-shadow: 0 4px 14px rgba(17, 17, 20, 0.06);
+  align-self: stretch;
 }
 
 .fashion-header-row {
@@ -1176,6 +1210,23 @@
   flex: 1;
   font-family: 'Outfit', sans-serif;
   font-size: 18px;
+}
+
+.fashion-subheader-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(79, 195, 247, 0.2);
+}
+
+.fashion-subheader-eta {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--fashion-accent-soft);
+  color: var(--fashion-accent);
+  font-size: 10px;
   font-weight: 800;
 }
 
@@ -2333,8 +2384,9 @@
   position: absolute;
   inset: 0;
   background:
+    radial-gradient(circle at 50% 42%, rgba(79, 195, 247, 0.18), transparent 42%),
     radial-gradient(circle at 50% 42%, rgba(251, 113, 133, 0.22), transparent 42%),
-    linear-gradient(135deg, #151311 0%, #29221f 62%, #831843 145%);
+    linear-gradient(135deg, #151311 0%, #1a2430 42%, #29221f 62%, #831843 145%);
 }
 
 .fashion-splash-logo {
@@ -2343,6 +2395,13 @@
   object-fit: cover;
   box-shadow: 0 12px 32px rgba(225, 29, 72, 0.35);
   z-index: 2;
+}
+
+.fashion-splash-logo-center {
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
 }
 
 .fashion-splash-copy {

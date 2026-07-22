@@ -7,7 +7,7 @@ import {
   Bike,
   UserCog,
   Tags,
-  Shirt,
+  Package,
   Ticket,
   Settings,
   Wallet,
@@ -33,6 +33,9 @@ import {
   ORDERS,
   CATEGORIES,
   PRODUCTS,
+  DARKSTORE_ZONES,
+  VENDOR_ZONE_INVENTORY,
+  FEATURED_SHOPS,
   formatINR,
 } from '../data/mockData'
 
@@ -44,7 +47,7 @@ const NAV = [
   { id: 'darkstore', label: 'Darkstore', icon: Store },
   { id: 'users', label: 'Manage Users', icon: UserCog },
   { id: 'categories', label: 'Categories', icon: Tags },
-  { id: 'apparels', label: 'Apparels', icon: Shirt },
+  { id: 'vendor-stock', label: 'Vendor Zone Stock', icon: Package },
   { id: 'coupons', label: 'Coupons', icon: Ticket },
   { id: 'orders', label: 'Orders', icon: ShoppingBag },
   { id: 'payments', label: 'Payments', icon: Wallet },
@@ -119,6 +122,7 @@ export default function AdminApp() {
   const [commission, setCommission] = useState(12)
   const [toast, setToast] = useState('')
   const [customerDetail, setCustomerDetail] = useState(null)
+  const [vendorFocus, setVendorFocus] = useState(null)
 
   const notify = (m) => {
     setToast(m)
@@ -178,6 +182,7 @@ export default function AdminApp() {
         <button type="button" className="panel-nav-item" style={{ marginTop: 'auto' }} onClick={() => setAuthed(false)}>
           <LogOut size={18} /> Logout
         </button>
+        <div className="panel-sidebar-version">v 1.0</div>
       </aside>
 
       <main className="panel-main">
@@ -198,19 +203,34 @@ export default function AdminApp() {
         </div>
 
         <div className="panel-content fade-in">
-          {section === 'dashboard' && <AdminDashboard />}
+          {section === 'dashboard' && (
+            <AdminDashboard
+              onActiveVendors={() => {
+                setVendorFocus(null)
+                setSection('vendors')
+              }}
+            />
+          )}
           {section === 'customers' && (
             <Customers
               detail={customerDetail}
               setDetail={setCustomerDetail}
             />
           )}
-          {section === 'vendors' && <Vendors vendors={vendors} setVendors={setVendors} notify={notify} />}
+          {section === 'vendors' && (
+            <Vendors
+              vendors={vendors}
+              setVendors={setVendors}
+              notify={notify}
+              focusVendorId={vendorFocus}
+              onFocusVendor={setVendorFocus}
+            />
+          )}
           {section === 'drivers' && <Drivers drivers={drivers} setDrivers={setDrivers} notify={notify} />}
           {section === 'darkstore' && <DarkStoreMonitor />}
           {section === 'users' && <ManageUsers notify={notify} />}
           {section === 'categories' && <AdminCategories notify={notify} />}
-          {section === 'apparels' && <ApparelsMgmt />}
+          {section === 'vendor-stock' && <VendorZoneStockMgmt vendors={vendors} />}
           {section === 'coupons' && <CouponMgmt coupons={coupons} setCoupons={setCoupons} notify={notify} />}
           {section === 'orders' && <AdminOrders />}
           {section === 'payments' && <AdminPayments notify={notify} />}
@@ -258,21 +278,27 @@ function AdminLogin({ onLogin }) {
   )
 }
 
-function AdminDashboard() {
+function AdminDashboard({ onActiveVendors }) {
   return (
     <div className="stat-grid">
       {[
-        ['Customers', '1,284'],
-        ['Active Vendors', '46'],
-        ['Drivers Online', '28'],
-        ['Orders Today', '192'],
-        ['GMV', '₹4.8L'],
-        ['Pending KYC', '7'],
-      ].map(([label, value]) => (
-        <div key={label} className="stat-card">
+        ['Customers', '1,284', null],
+        ['Active Vendors', '46', onActiveVendors],
+        ['Drivers Online', '28', null],
+        ['Orders Today', '192', null],
+        ['GMV', '₹4.8L', null],
+        ['Pending KYC', '7', null],
+      ].map(([label, value, onClick]) => (
+        <button
+          key={label}
+          type="button"
+          className={`stat-card${onClick ? ' stat-card-clickable' : ''}`}
+          onClick={onClick || undefined}
+          style={onClick ? { cursor: 'pointer', textAlign: 'left' } : undefined}
+        >
           <div className="label">{label}</div>
           <div className="value" style={{ fontSize: 26 }}>{value}</div>
-        </div>
+        </button>
       ))}
     </div>
   )
@@ -1040,9 +1066,13 @@ function Customers({ detail, setDetail }) {
   )
 }
 
-function Vendors({ vendors, setVendors, notify }) {
+function Vendors({ vendors, setVendors, notify, focusVendorId, onFocusVendor }) {
   const [confirm, setConfirm] = useState(null)
   const [loading, setLoading] = useState(false)
+  const selectedVendor = vendors.find((vendor) => vendor.id === focusVendorId) || null
+  const vendorProducts = selectedVendor
+    ? PRODUCTS.filter((product) => product.shopId === selectedVendor.shopId)
+    : []
 
   const runAction = () => {
     if (!confirm) return
@@ -1062,18 +1092,79 @@ function Vendors({ vendors, setVendors, notify }) {
 
   return (
     <>
+      {selectedVendor ? (
+        <div>
+          <button type="button" className="btn btn-ghost" style={{ marginBottom: 14 }} onClick={() => onFocusVendor?.(null)}>
+            ← Back to vendors
+          </button>
+          <div className="card" style={{ padding: 18, marginBottom: 16 }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', margin: '0 0 6px' }}>{selectedVendor.name}</h3>
+            <p style={{ margin: 0, color: 'var(--muted)', fontSize: 13 }}>
+              Owner: {selectedVendor.owner} · Shop status: {selectedVendor.online ? 'Online' : 'Offline'}
+            </p>
+          </div>
+          <div className="table-wrap">
+            <table className="data">
+              <thead>
+                <tr><th>Product</th><th>Brand</th><th>Category</th><th>Price</th><th>Listing</th></tr>
+              </thead>
+              <tbody>
+                {vendorProducts.length ? vendorProducts.map((product) => (
+                  <tr key={product.id}>
+                    <td style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      <img src={product.image} alt="" style={{ width: 36, height: 44, objectFit: 'cover', borderRadius: 6 }} />
+                      {product.title}
+                    </td>
+                    <td>{product.brand}</td>
+                    <td>{product.category}</td>
+                    <td>{formatINR(product.price)}</td>
+                    <td><span className="badge badge-teal">Uploaded</span></td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={5} style={{ color: 'var(--muted)' }}>No products uploaded by this vendor yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
       <div className="table-wrap">
         <table className="data">
           <thead>
-            <tr><th>Vendor</th><th>Owner</th><th>Docs</th><th>Sales</th><th>Status</th><th>Actions</th></tr>
+            <tr><th>Vendor</th><th>Owner</th><th>Docs</th><th>Sales</th><th>Shop</th><th>Status</th><th>Actions</th></tr>
           </thead>
           <tbody>
             {vendors.map((v) => (
               <tr key={v.id}>
-                <td>{v.name}</td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ height: 'auto', padding: 0, fontWeight: 700 }}
+                    onClick={() => onFocusVendor?.(v.id)}
+                  >
+                    {v.name}
+                  </button>
+                </td>
                 <td>{v.owner}</td>
                 <td><span className={`badge ${v.docs === 'Approved' ? 'badge-teal' : 'badge-warn'}`}>{v.docs}</span></td>
                 <td>{v.sales}</td>
+                <td>
+                  <button
+                    type="button"
+                    className={`toggle ${v.online ? 'on' : ''}`}
+                    aria-label={`${v.name} shop ${v.online ? 'online' : 'offline'}`}
+                    onClick={() => {
+                      setVendors((list) => list.map((x) => x.id === v.id ? { ...x, online: !x.online } : x))
+                      notify(`${v.name} shop is now ${!v.online ? 'online' : 'offline'}`)
+                    }}
+                  />
+                  <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 700, color: v.online ? 'var(--teal-dark)' : 'var(--muted)' }}>
+                    {v.online ? 'Online' : 'Offline'}
+                  </span>
+                </td>
                 <td><StatusBadge status={v.status} /></td>
                 <td style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {v.docs === 'Pending' && (
@@ -1114,6 +1205,7 @@ function Vendors({ vendors, setVendors, notify }) {
           </tbody>
         </table>
       </div>
+      )}
       <ConfirmDialog
         open={!!confirm}
         title={confirm?.type === 'suspend' ? 'Suspend Vendor?' : 'Recover Vendor?'}
@@ -1419,26 +1511,95 @@ function AdminCategories({ notify }) {
   )
 }
 
-function ApparelsMgmt() {
+function VendorZoneStockMgmt({ vendors }) {
+  const vendorRows = vendors.map((vendor) => {
+    const lines = VENDOR_ZONE_INVENTORY.filter((item) => item.vendorId === vendor.id)
+    const zoneTotals = DARKSTORE_ZONES.reduce((acc, zone) => {
+      acc[zone] = lines.filter((item) => item.zone === zone).reduce((sum, item) => sum + item.quantity, 0)
+      return acc
+    }, {})
+    const total = lines.reduce((sum, item) => sum + item.quantity, 0)
+    const reserved = lines.reduce((sum, item) => sum + item.reserved, 0)
+    const shopLogo = FEATURED_SHOPS.find((shop) => shop.id === vendor.shopId)?.logo
+    const products = [...new Set(lines.map((item) => item.sku))].map((sku) => {
+      const sample = lines.find((item) => item.sku === sku)
+      return {
+        sku,
+        productName: sample.productName,
+        image: sample.image,
+        lines: lines.filter((item) => item.sku === sku),
+      }
+    })
+    return { vendor, lines, zoneTotals, total, reserved, shopLogo, products }
+  })
+
   return (
-    <div className="table-wrap">
-      <table className="data">
-        <thead><tr><th>Apparel</th><th>Brand</th><th>Category</th><th>Price</th><th>Vendor Package</th></tr></thead>
-        <tbody>
-          {PRODUCTS.map((p) => (
-            <tr key={p.id}>
-              <td style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <img src={p.image} alt="" style={{ width: 36, height: 44, objectFit: 'cover', borderRadius: 6 }} />
-                {p.title}
-              </td>
-              <td>{p.brand}</td>
-              <td>{p.category}</td>
-              <td>{formatINR(p.price)}</td>
-              <td><span className="badge badge-teal">Reviewed</span></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <p style={{ margin: '0 0 16px', color: 'var(--muted)', fontSize: 14, lineHeight: 1.5 }}>
+        Dark store stock by vendor with size-level counts in each zone.
+      </p>
+
+      {vendorRows.map(({ vendor, zoneTotals, total, reserved, shopLogo, products, lines }) => (
+        <div key={vendor.id} className="card" style={{ padding: 18, marginBottom: 18 }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+            <img
+              src={shopLogo || products[0]?.image}
+              alt=""
+              style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover' }}
+            />
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <h3 style={{ fontFamily: 'var(--font-display)', margin: '0 0 4px' }}>{vendor.name}</h3>
+              <p style={{ margin: 0, color: 'var(--muted)', fontSize: 13 }}>
+                {vendor.owner} · <StatusBadge status={vendor.status} />
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {DARKSTORE_ZONES.map((zone) => (
+                <span key={zone} className="badge badge-slate">{zone}: {zoneTotals[zone] || 0}</span>
+              ))}
+              <span className="badge badge-teal">Total: {total}</span>
+              <span className="badge badge-warn">Reserved: {reserved}</span>
+            </div>
+          </div>
+
+          {products.length ? products.map((product) => (
+            <div key={product.sku} style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                <img src={product.image} alt="" style={{ width: 44, height: 54, objectFit: 'cover', borderRadius: 8 }} />
+                <div>
+                  <strong style={{ display: 'block', color: 'var(--slate)' }}>{product.productName}</strong>
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>{product.sku}</span>
+                </div>
+              </div>
+              <div className="table-wrap">
+                <table className="data">
+                  <thead>
+                    <tr><th>Zone</th><th>Size</th><th>Count</th><th>Reserved</th><th>Available</th><th>Status</th></tr>
+                  </thead>
+                  <tbody>
+                    {product.lines.map((item) => (
+                      <tr key={`${item.sku}-${item.zone}-${item.size}`}>
+                        <td>{item.zone}</td>
+                        <td><strong>{item.size}</strong></td>
+                        <td>{item.quantity}</td>
+                        <td>{item.reserved}</td>
+                        <td>{item.quantity - item.reserved}</td>
+                        <td>
+                          <span className={`badge ${item.inStock && item.quantity > item.reserved ? 'badge-teal' : 'badge-danger'}`}>
+                            {item.inStock && item.quantity > item.reserved ? 'In Stock' : 'Out of Stock'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )) : (
+            <p style={{ margin: 0, color: 'var(--muted)', fontSize: 13 }}>No dark store stock allocated for this vendor yet.</p>
+          )}
+        </div>
+      ))}
     </div>
   )
 }

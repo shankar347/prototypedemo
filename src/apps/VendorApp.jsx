@@ -120,6 +120,7 @@ export default function VendorApp() {
         >
           <LogOut size={18} /> Logout
         </button>
+        <div className="panel-sidebar-version">v 1.0</div>
       </aside>
 
       <main className="panel-main">
@@ -332,6 +333,26 @@ function ItemManagement({ items, setItems, notify }) {
   const [cats] = useState(CATEGORIES.map((c) => ({ ...c, active: true })))
   const [tab, setTab] = useState('items')
 
+  const toggleSizeStock = (itemId, sizeLabel) => {
+    setItems((list) => list.map((item) => {
+      if (item.id !== itemId) return item
+      const sizeStock = item.sizeStock.map((entry) => (
+        entry.size === sizeLabel ? { ...entry, inStock: !entry.inStock } : entry
+      ))
+      const stock = sizeStock.some((entry) => entry.inStock && entry.qty > 0)
+      return { ...item, sizeStock, stock }
+    }))
+    notify('Size stock updated')
+  }
+
+  const toggleItemActive = (itemId) => {
+    setItems((list) => list.map((item) => (
+      item.id === itemId ? { ...item, active: !item.active } : item
+    )))
+    const item = items.find((entry) => entry.id === itemId)
+    notify(item?.active ? 'Item deactivated in catalog' : 'Item activated in catalog')
+  }
+
   return (
     <>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -359,58 +380,62 @@ function ItemManagement({ items, setItems, notify }) {
           </table>
         </div>
       ) : (
-        <div className="table-wrap">
-          <table className="data">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Size / Color</th>
-                <th>Stock (sale visibility)</th>
-                <th>Active (listed in catalog)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it) => (
-                <tr key={it.id}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <img src={it.image} alt="" style={{ width: 40, height: 48, objectFit: 'cover', borderRadius: 6 }} />
-                    {it.title}
-                  </td>
-                  <td>{it.category}</td>
-                  <td>{formatINR(it.price)}</td>
-                  <td>{it.size} · {it.color}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className={`toggle ${it.stock ? 'on' : ''}`}
-                      onClick={() => {
-                        setItems((list) => list.map((x) => (x.id === it.id ? { ...x, stock: !x.stock } : x)))
-                        notify(it.stock ? 'Marked Out of Stock — hidden from sale' : 'Marked In Stock — visible for sale')
-                      }}
-                    />
-                    <span style={{ marginLeft: 8, fontSize: 12 }}>{it.stock ? 'In Stock' : 'Out of Stock'}</span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className={`toggle ${it.active ? 'on' : ''}`}
-                      onClick={() => {
-                        setItems((list) => list.map((x) => (x.id === it.id ? { ...x, active: !x.active } : x)))
-                        notify(it.active ? 'Item deactivated in catalog' : 'Item activated in catalog')
-                      }}
-                    />
-                    <span style={{ marginLeft: 8, fontSize: 12 }}>{it.active ? 'Active' : 'Inactive'}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ display: 'grid', gap: 14 }}>
+          {items.map((it) => (
+            <div key={it.id} className="card" style={{ padding: 16 }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 14, flexWrap: 'wrap' }}>
+                <img src={it.image} alt="" style={{ width: 52, height: 62, objectFit: 'cover', borderRadius: 8 }} />
+                <div style={{ flex: 1, minWidth: 180 }}>
+                  <strong style={{ display: 'block', fontSize: 15, color: 'var(--slate)' }}>{it.title}</strong>
+                  <span style={{ display: 'block', marginTop: 4, fontSize: 12, color: 'var(--muted)' }}>{it.category}</span>
+                  <span style={{ display: 'block', marginTop: 4, fontSize: 12, color: 'var(--muted)' }}>Color: {it.color}</span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <strong style={{ display: 'block', fontSize: 15 }}>{formatINR(it.price)}</strong>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, justifyContent: 'flex-end' }}>
+                    <button type="button" className={`toggle ${it.active ? 'on' : ''}`} onClick={() => toggleItemActive(it.id)} />
+                    <span style={{ fontSize: 12 }}>{it.active ? 'Active' : 'Inactive'}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="table-wrap">
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th>Size</th>
+                      <th>Count</th>
+                      <th>Stock status</th>
+                      <th>Visibility</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(it.sizeStock || []).map((entry) => (
+                      <tr key={`${it.id}-${entry.size}`}>
+                        <td><strong>{entry.size}</strong></td>
+                        <td>{entry.qty}</td>
+                        <td>
+                          <span className={`badge ${entry.inStock && entry.qty > 0 ? 'badge-teal' : 'badge-danger'}`}>
+                            {entry.inStock && entry.qty > 0 ? 'In Stock' : 'Out of Stock'}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className={`toggle ${entry.inStock ? 'on' : ''}`}
+                            onClick={() => toggleSizeStock(it.id, entry.size)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
         </div>
       )}
       <p style={{ marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
-        <strong>Active</strong> controls catalog listing. <strong>Out of Stock</strong> only hides the item from purchase while keeping it in your catalog.
+        <strong>Active</strong> controls catalog listing. Toggle each size to mark it in stock or out of stock for customers.
       </p>
 
       {show && (

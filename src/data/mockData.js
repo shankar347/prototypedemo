@@ -1205,33 +1205,48 @@ export const VENDOR_ITEMS = [
     title: 'Aqua Linen Shirt',
     category: 'Men / Shirts',
     price: 1299,
-    size: 'S-XL',
     color: 'Teal',
     stock: true,
     active: true,
     image: PRODUCTS[0].image,
+    sizeStock: [
+      { size: 'S', qty: 8, inStock: true },
+      { size: 'M', qty: 14, inStock: true },
+      { size: 'L', qty: 11, inStock: true },
+      { size: 'XL', qty: 6, inStock: true },
+    ],
   },
   {
     id: 'vi2',
     title: 'Essential Cotton Tee',
     category: 'Men / T-Shirts',
     price: 599,
-    size: 'S-XXL',
     color: 'Multi',
     stock: true,
     active: true,
     image: PRODUCTS[3].image,
+    sizeStock: [
+      { size: 'S', qty: 22, inStock: true },
+      { size: 'M', qty: 18, inStock: true },
+      { size: 'L', qty: 15, inStock: true },
+      { size: 'XL', qty: 9, inStock: true },
+      { size: 'XXL', qty: 4, inStock: true },
+    ],
   },
   {
     id: 'vi3',
     title: 'Midnight Denim Jacket',
     category: 'Men / Jackets',
     price: 2499,
-    size: 'M-XL',
     color: 'Indigo',
     stock: false,
     active: true,
     image: PRODUCTS[1].image,
+    sizeStock: [
+      { size: 'M', qty: 0, inStock: false },
+      { size: 'L', qty: 0, inStock: false },
+      { size: 'XL', qty: 0, inStock: false },
+    ],
   },
 ]
 
@@ -1245,8 +1260,46 @@ export const DRIVER_REQUESTS = [
     items: 3,
     distance: '4.2 km',
     earn: 85,
+    incentive: 15,
     status: 'Incoming',
   },
+  {
+    id: 'DR-442',
+    shop: 'Bloom Closet',
+    shopAddr: 'T Nagar Main Rd, Chennai',
+    customer: 'Rahul Mehta',
+    dropAddr: '8 Teal Tower, T Nagar',
+    items: 2,
+    distance: '3.1 km',
+    earn: 70,
+    incentive: 10,
+    status: 'Incoming',
+  },
+]
+
+export const DRIVER_TODAY_RIDES = [
+  { id: 'DR-430', shop: 'Hot Spot', time: '9:42 AM', distance: '2.8 km', earn: 65, incentive: 10, status: 'Delivered' },
+  { id: 'DR-431', shop: 'Raymond', time: '10:18 AM', distance: '4.0 km', earn: 80, incentive: 15, status: 'Delivered' },
+  { id: 'DR-432', shop: 'Trends', time: '11:05 AM', distance: '3.4 km', earn: 72, incentive: 12, status: 'Delivered' },
+  { id: 'DR-433', shop: 'Max', time: '12:22 PM', distance: '5.1 km', earn: 95, incentive: 20, status: 'Delivered' },
+  { id: 'DR-434', shop: 'Blue Moon', time: '1:40 PM', distance: '2.2 km', earn: 58, incentive: 8, status: 'Delivered' },
+]
+
+export const DRIVER_WEEKLY = [
+  { day: 'Mon', rides: 8, earn: 620 },
+  { day: 'Tue', rides: 11, earn: 840 },
+  { day: 'Wed', rides: 9, earn: 710 },
+  { day: 'Thu', rides: 12, earn: 920 },
+  { day: 'Fri', rides: 10, earn: 780 },
+  { day: 'Sat', rides: 14, earn: 1050 },
+  { day: 'Sun', rides: 7, earn: 540 },
+]
+
+export const DRIVER_MONTHLY = [
+  { week: 'Week 1', rides: 48, earn: 3680 },
+  { week: 'Week 2', rides: 52, earn: 4020 },
+  { week: 'Week 3', rides: 45, earn: 3510 },
+  { week: 'Week 4', rides: 58, earn: 4460 },
 ]
 
 export const ADMIN_CUSTOMERS = [
@@ -1256,10 +1309,38 @@ export const ADMIN_CUSTOMERS = [
 ]
 
 export const ADMIN_VENDORS = [
-  { id: 'V01', name: 'Coastline Boutique', owner: 'Suresh K', docs: 'Approved', status: 'Active', sales: '₹2.4L' },
-  { id: 'V02', name: 'Bloom Closet', owner: 'Meera P', docs: 'Pending', status: 'Pending', sales: '₹0' },
-  { id: 'V03', name: 'Stride Foot Co', owner: 'Arjun N', docs: 'Approved', status: 'Active', sales: '₹1.1L' },
-  { id: 'V04', name: 'Coral Boutique', owner: 'Lakshmi R', docs: 'Approved', status: 'Suspended', sales: '₹86K' },
+  { id: 'V01', name: 'Coastline Boutique', owner: 'Suresh K', docs: 'Approved', status: 'Active', sales: '₹2.4L', online: true, shopId: 'hot-spot' },
+  { id: 'V02', name: 'Bloom Closet', owner: 'Meera P', docs: 'Pending', status: 'Pending', sales: '₹0', online: false, shopId: 'blue-moon' },
+  { id: 'V03', name: 'Stride Foot Co', owner: 'Arjun N', docs: 'Approved', status: 'Active', sales: '₹1.1L', online: true, shopId: 'raymond' },
+  { id: 'V04', name: 'Coral Boutique', owner: 'Lakshmi R', docs: 'Approved', status: 'Suspended', sales: '₹86K', online: false, shopId: 'trends' },
+]
+
+export const DARKSTORE_ZONES = ['Zone A', 'Zone B', 'Zone C', 'Zone D']
+
+/** Dark store stock held per vendor, broken down by zone and size. */
+export const VENDOR_ZONE_INVENTORY = [
+  { vendorId: 'V01', sku: 'DS-HS-001', productName: 'Banarasi Silk Saree', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=240&fit=crop', zone: 'Zone A', size: 'Free Size', quantity: 14, reserved: 2, inStock: true },
+  { vendorId: 'V01', sku: 'DS-HS-001', productName: 'Banarasi Silk Saree', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=240&fit=crop', zone: 'Zone B', size: 'Free Size', quantity: 10, reserved: 1, inStock: true },
+  { vendorId: 'V01', sku: 'DS-HS-002', productName: 'Sequin Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone A', size: 'S', quantity: 3, reserved: 1, inStock: true },
+  { vendorId: 'V01', sku: 'DS-HS-002', productName: 'Sequin Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone A', size: 'M', quantity: 5, reserved: 1, inStock: true },
+  { vendorId: 'V01', sku: 'DS-HS-002', productName: 'Sequin Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone D', size: 'L', quantity: 4, reserved: 0, inStock: true },
+  { vendorId: 'V01', sku: 'DS-HS-002', productName: 'Sequin Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone D', size: 'XL', quantity: 2, reserved: 0, inStock: false },
+  { vendorId: 'V02', sku: 'DS-BM-001', productName: 'Designer Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone B', size: 'S', quantity: 6, reserved: 1, inStock: true },
+  { vendorId: 'V02', sku: 'DS-BM-001', productName: 'Designer Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone B', size: 'M', quantity: 9, reserved: 1, inStock: true },
+  { vendorId: 'V02', sku: 'DS-BM-001', productName: 'Designer Party Gown', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=240&fit=crop', zone: 'Zone C', size: 'L', quantity: 7, reserved: 1, inStock: true },
+  { vendorId: 'V02', sku: 'DS-BM-002', productName: 'Embroidered Lehenga', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=200&h=240&fit=crop', zone: 'Zone B', size: 'Free Size', quantity: 5, reserved: 0, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-001', productName: 'Structured Formal Blazer Set', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone A', size: '36', quantity: 4, reserved: 1, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-001', productName: 'Structured Formal Blazer Set', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone A', size: '38', quantity: 8, reserved: 2, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-001', productName: 'Structured Formal Blazer Set', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone A', size: '40', quantity: 6, reserved: 1, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-001', productName: 'Structured Formal Blazer Set', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone D', size: '38', quantity: 7, reserved: 0, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-001', productName: 'Structured Formal Blazer Set', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone D', size: '40', quantity: 7, reserved: 0, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-002', productName: 'Classic Formal Trouser', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone C', size: '32', quantity: 5, reserved: 0, inStock: true },
+  { vendorId: 'V03', sku: 'DS-RM-002', productName: 'Classic Formal Trouser', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&h=240&fit=crop', zone: 'Zone C', size: '34', quantity: 6, reserved: 1, inStock: true },
+  { vendorId: 'V04', sku: 'DS-TR-001', productName: 'Floral Midi Dress', image: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=200&h=240&fit=crop', zone: 'Zone C', size: 'S', quantity: 4, reserved: 1, inStock: true },
+  { vendorId: 'V04', sku: 'DS-TR-001', productName: 'Floral Midi Dress', image: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=200&h=240&fit=crop', zone: 'Zone C', size: 'M', quantity: 5, reserved: 0, inStock: true },
+  { vendorId: 'V04', sku: 'DS-TR-001', productName: 'Floral Midi Dress', image: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=200&h=240&fit=crop', zone: 'Zone D', size: 'L', quantity: 4, reserved: 0, inStock: true },
+  { vendorId: 'V04', sku: 'DS-TR-002', productName: 'Casual Co-ord Set', image: 'https://images.unsplash.com/photo-1554568218-0f1715e72254?w=200&h=240&fit=crop', zone: 'Zone A', size: 'M', quantity: 2, reserved: 0, inStock: true },
+  { vendorId: 'V04', sku: 'DS-TR-002', productName: 'Casual Co-ord Set', image: 'https://images.unsplash.com/photo-1554568218-0f1715e72254?w=200&h=240&fit=crop', zone: 'Zone A', size: 'L', quantity: 1, reserved: 0, inStock: false },
 ]
 
 export const ADMIN_DRIVERS = [

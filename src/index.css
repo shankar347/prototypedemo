@@ -387,6 +387,13 @@ img {
   max-width: 100%;
 }
 
+.phone-scroll > .toast {
+  flex: 0 0 auto;
+  min-height: 0;
+  width: max-content;
+  max-width: 90vw;
+}
+
 .bottom-nav {
   position: relative;
   z-index: 60;
@@ -515,6 +522,17 @@ img {
 
 .panel-nav-item.active {
   background: var(--brand-grad);
+}
+
+.panel-sidebar-version {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .panel-main {
@@ -661,6 +679,10 @@ table.data tr:hover td {
   animation: slideUp 0.3s ease;
   white-space: nowrap;
   max-width: 90vw;
+  width: max-content;
+  height: auto;
+  min-height: 0 !important;
+  flex: none !important;
 }
 
 .modal-backdrop {
@@ -693,9 +715,9 @@ table.data tr:hover td {
 
 .progress-steps {
   display: flex;
-  align-items: center;
-  gap: 0;
+  align-items: flex-start;
   width: 100%;
+  gap: 0;
 }
 
 .progress-steps .step {
@@ -703,25 +725,42 @@ table.data tr:hover td {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   position: relative;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.25;
+  text-align: center;
   color: var(--muted);
   font-weight: 500;
+  min-width: 0;
 }
 
-.progress-steps .step::before {
+.progress-steps .step-dot {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  border-radius: 50%;
+  background: var(--line);
+  position: relative;
+  z-index: 1;
+}
+
+.progress-steps .step:not(:has(.step-dot))::before {
   content: '';
   width: 12px;
   height: 12px;
+  flex: 0 0 12px;
   border-radius: 50%;
   background: var(--line);
   z-index: 1;
 }
 
-.progress-steps .step.done::before,
-.progress-steps .step.active::before {
+.progress-steps .step.done .step-dot,
+.progress-steps .step.active .step-dot,
+.progress-steps .step.done:not(:has(.step-dot))::before,
+.progress-steps .step.active:not(:has(.step-dot))::before {
   background: var(--teal);
+  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.14);
 }
 
 .progress-steps .step.active {
@@ -737,10 +776,17 @@ table.data tr:hover td {
   width: calc(100% - 16px);
   height: 2px;
   background: var(--line);
+  z-index: 0;
 }
 
 .progress-steps .step.done:not(:last-child)::after {
   background: var(--teal);
+}
+
+.progress-steps .step span {
+  display: block;
+  max-width: 100%;
+  padding: 0 2px;
 }
 
 .empty {
