@@ -621,10 +621,10 @@ function SplashIntro({ onComplete }) {
   const [phase, setPhase] = useState('intro')
 
   useEffect(() => {
-    const growTimer = window.setTimeout(() => setPhase('grow'), 280)
-    const holdTimer = window.setTimeout(() => setPhase('hold'), 900)
-    const exitTimer = window.setTimeout(() => setPhase('exit'), 1500)
-    const doneTimer = window.setTimeout(onComplete, 1950)
+    const growTimer = window.setTimeout(() => setPhase('grow'), 450)
+    const holdTimer = window.setTimeout(() => setPhase('hold'), 2400)
+    const exitTimer = window.setTimeout(() => setPhase('exit'), 3100)
+    const doneTimer = window.setTimeout(onComplete, 3800)
     return () => {
       window.clearTimeout(growTimer)
       window.clearTimeout(holdTimer)
@@ -634,10 +634,10 @@ function SplashIntro({ onComplete }) {
   }, [onComplete])
 
   const logoMotion = {
-    intro: { opacity: 1, scale: 0.42, width: 112, height: 112 },
-    grow: { opacity: 1, scale: 1.08, width: 112, height: 112 },
+    intro: { opacity: 1, scale: 0.32, width: 112, height: 112 },
+    grow: { opacity: 1, scale: 1.12, width: 112, height: 112 },
     hold: { opacity: 1, scale: 1, width: 112, height: 112 },
-    exit: { opacity: 0, scale: 1.18, width: 112, height: 112 },
+    exit: { opacity: 0, scale: 1.22, width: 112, height: 112 },
   }
 
   return (
@@ -645,19 +645,19 @@ function SplashIntro({ onComplete }) {
       className="fashion-splash"
       initial={{ opacity: 1 }}
       animate={{ opacity: phase === 'exit' ? 0 : 1 }}
-      transition={{ duration: phase === 'exit' ? 0.4 : 0 }}
+      transition={{ duration: phase === 'exit' ? 0.65 : 0 }}
       aria-hidden={phase === 'exit'}
     >
       <motion.div
         className="fashion-splash-bg"
         animate={{ opacity: phase === 'exit' ? 0 : 1 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.65 }}
       />
       <motion.img
         src="/logo.png"
         alt="KudiCart"
         className="fashion-splash-logo fashion-splash-logo-center"
-        initial={{ opacity: 0, scale: 0.28, top: '46%', left: '50%', x: '-50%', y: '-50%', width: 112, height: 112 }}
+        initial={{ opacity: 0, scale: 0.18, top: '46%', left: '50%', x: '-50%', y: '-50%', width: 112, height: 112 }}
         animate={{
           ...logoMotion[phase],
           top: '46%',
@@ -666,16 +666,16 @@ function SplashIntro({ onComplete }) {
           y: '-50%',
         }}
         transition={{
-          duration: phase === 'grow' ? 0.7 : phase === 'exit' ? 0.4 : 0.35,
-          ease: [0.22, 1, 0.36, 1],
+          duration: phase === 'grow' ? 1.85 : phase === 'exit' ? 0.65 : phase === 'hold' ? 0.45 : 0.55,
+          ease: phase === 'grow' ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1],
         }}
       />
       {(phase === 'grow' || phase === 'hold') && (
         <motion.div
           className="fashion-splash-copy"
-          initial={{ opacity: 0, scale: 0.92, y: 8 }}
+          initial={{ opacity: 0, scale: 0.9, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ delay: 0.55, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
         >
           <strong>KudiCart</strong>
           <span>Fashion · Try & Buy at your doorstep</span>
