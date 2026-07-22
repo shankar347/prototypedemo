@@ -100,9 +100,11 @@
   top: 0;
   z-index: 30;
   padding: 12px 14px 0;
-  color: #111114;
-  background: linear-gradient(180deg, #d9ecff 0%, #e8f4ff 72%, #f4f9ff 100%);
-  box-shadow: 0 4px 18px rgba(17, 17, 20, 0.06);
+  color: #fff;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(251, 113, 133, 0.3), transparent 36%),
+    linear-gradient(135deg, #151311 0%, #29221f 62%, #831843 145%);
+  box-shadow: 0 8px 26px rgba(17, 17, 20, 0.16);
 }
 
 .fashion-header-slikk {
@@ -124,10 +126,11 @@
   display: grid;
   place-content: center;
   border-radius: 12px;
-  background: #111114;
+  background: var(--fashion-accent);
   color: #fff;
   text-align: center;
   line-height: 1;
+  box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
 }
 
 .fashion-delivery-badge strong {
@@ -150,7 +153,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #111114;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.25;
@@ -173,9 +176,9 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  border: 1.5px solid rgba(17, 17, 20, 0.14);
-  background: rgba(255, 255, 255, 0.72);
-  color: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.11);
+  color: #fff;
 }
 
 .fashion-header-search-row {
@@ -192,20 +195,20 @@
   padding: 0 12px;
   border: none;
   border-radius: 12px;
-  background: #ffd600;
-  color: #111114;
+  background: var(--fashion-accent);
+  color: #fff;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.04em;
   line-height: 1.15;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(255, 214, 0, 0.35);
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
 }
 
 .fashion-trybuy-cta.active {
-  background: #111114;
-  color: #ffd600;
-  box-shadow: 0 4px 14px rgba(17, 17, 20, 0.2);
+  background: #fff;
+  color: var(--fashion-accent);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
 }
 
 .fashion-search-inline {
@@ -2261,7 +2264,7 @@
   padding-top: 10px;
   border: none;
   background: transparent;
-  color: #111114;
+  color: #fff;
   text-align: center;
 }
 
@@ -2283,6 +2286,10 @@
   height: 92px;
 }
 
+.fashion-header-category-chip.active {
+  color: #111114;
+}
+
 .fashion-header-category-chip span {
   position: relative;
   z-index: 1;
@@ -2292,9 +2299,9 @@
   margin: 0 auto 5px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(17, 17, 20, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 .fashion-header-category-chip img {
@@ -3076,7 +3083,7 @@
 .fashion-view-cart-pill {
   position: fixed;
   left: 50%;
-  bottom: 78px;
+  bottom: 96px;
   transform: translateX(-50%);
   z-index: 24;
   display: inline-flex;
@@ -3085,9 +3092,9 @@
   padding: 8px 16px 8px 8px;
   border: none;
   border-radius: 999px;
-  background: var(--fashion-black);
+  background: var(--fashion-accent);
   color: #fff;
-  box-shadow: 0 8px 24px rgba(17, 17, 20, 0.24);
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.35);
 }
 
 .fashion-view-cart-thumbs {
